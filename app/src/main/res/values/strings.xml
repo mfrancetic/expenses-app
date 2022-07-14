@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ExpensesApp</string>
+
+    <!-- ExpensesListScreen -->
+    <string name="expenses_list_header">List of Expenses</string>
+    <string name="add_expense">Add expense</string>
 </resources>
