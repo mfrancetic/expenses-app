@@ -10,15 +10,31 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.mfrancetic.expensesapp.ExpensesViewModel
 import com.mfrancetic.expensesapp.R
+import com.mfrancetic.expensesapp.models.ExpensesSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 
 // region UI
 
 @Composable
-fun ExpensesListScreen(onAddExpenseButtonClicked: () -> Unit) {
+fun ExpensesListScreen(
+    viewModel: ExpensesViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    navigateToExpensesDetailScreen: () -> Unit
+) {
+    LaunchedEffect(viewModel) {
+        viewModel.container.sideEffectFlow.collect { sideEffect ->
+            when (sideEffect) {
+                is ExpensesSideEffect.NavigateToExpensesDetailsScreen -> {
+                    navigateToExpensesDetailScreen.invoke()
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar {
@@ -29,7 +45,7 @@ fun ExpensesListScreen(onAddExpenseButtonClicked: () -> Unit) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onAddExpenseButtonClicked() }) {
+                onClick = { viewModel.onAddExpenseButtonClicked() }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(id = R.string.add_expense)
@@ -51,7 +67,7 @@ fun ExpensesListScreen(onAddExpenseButtonClicked: () -> Unit) {
 @Composable
 fun ExpensesListScreenPreview() {
     ExpensesAppTheme {
-        ExpensesListScreen {}
+        ExpensesListScreen(navigateToExpensesDetailScreen = {})
     }
 }
 // endregion
