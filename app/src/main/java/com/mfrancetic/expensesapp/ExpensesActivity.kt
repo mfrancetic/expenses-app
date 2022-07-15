@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
@@ -46,14 +48,26 @@ class ExpensesActivity : ComponentActivity() {
 
     @Composable
     fun ExpensesApp() {
+        val viewModel = hiltViewModel<ExpensesListViewModel>()
         val navController = rememberNavController()
-        NavigationNavHost(navController = navController)
+
+        LaunchedEffect(true) {
+            viewModel.container.sideEffectFlow.collect { sideEffect ->
+                when (sideEffect) {
+                    ExpensesListSideEffect.NavigateBack ->
+                        navController.navigateUp()
+                }
+            }
+        }
+
+        NavigationNavHost(navController = navController, viewModel = viewModel)
     }
 
     @Composable
-    fun NavigationNavHost(navController: NavHostController) {
-        val viewModel = hiltViewModel<ExpensesViewModel>()
-
+    fun NavigationNavHost(
+        navController: NavHostController,
+        viewModel: ExpensesListViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    ) {
         NavHost(
             navController = navController,
             startDestination = NavigationDestination.ExpensesListScreen.name
@@ -66,16 +80,16 @@ class ExpensesActivity : ComponentActivity() {
             }
             composable(NavigationDestination.ExpensesDetailScreen.name) {
                 ExpensesDetailScreen(
-                    viewModel = viewModel,
                     onUpButtonClicked = {
                         navController.navigateUp()
                     },
                     onSaveButtonClicked = { expense ->
-                        viewModel.onSaveButtonClicked(expense) }
+                        viewModel.onSaveButtonClicked(expense)
+                    }
                 )
             }
         }
-
     }
+
     // endregion
 }

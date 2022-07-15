@@ -2,8 +2,8 @@ package com.mfrancetic.expensesapp
 
 import androidx.lifecycle.ViewModel
 import com.mfrancetic.expensesapp.models.Expense
-import com.mfrancetic.expensesapp.models.ExpensesSideEffect
-import com.mfrancetic.expensesapp.models.ExpensesState
+import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
+import com.mfrancetic.expensesapp.models.ExpensesListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -13,13 +13,13 @@ import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
-class ExpensesViewModel @Inject constructor() : ViewModel(),
-    ContainerHost<ExpensesState, ExpensesSideEffect> {
+class ExpensesListViewModel @Inject constructor() : ViewModel(),
+    ContainerHost<ExpensesListState, ExpensesListSideEffect> {
 
     private var expenses = mutableListOf<Expense>()
 
     override val container =
-        container<ExpensesState, ExpensesSideEffect>(ExpensesState(expenses = emptyList()))
+        container<ExpensesListState, ExpensesListSideEffect>(ExpensesListState(expenses = emptyList()))
 
     // region Public Interface
 
@@ -29,7 +29,8 @@ class ExpensesViewModel @Inject constructor() : ViewModel(),
         reduce {
             state.copy(expenses = expenses.toList())
         }
-        postSideEffect(ExpensesSideEffect.NavigateFromExpensesDetailsToExpensesList)
+
+        postSideEffect(ExpensesListSideEffect.NavigateBack)
     }
 
     // endregion

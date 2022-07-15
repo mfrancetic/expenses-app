@@ -28,12 +28,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mfrancetic.expensesapp.ExpensesViewModel
+import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -41,7 +40,7 @@ import java.util.Calendar
 
 @Composable
 fun ExpensesListScreen(
-    viewModel: ExpensesViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: ExpensesListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val expenses = viewModel.container.stateFlow.collectAsState().value.expenses
