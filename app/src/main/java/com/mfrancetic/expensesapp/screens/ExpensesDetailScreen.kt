@@ -1,13 +1,19 @@
 package com.mfrancetic.expensesapp.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.util.Size
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,13 +21,18 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
@@ -115,18 +127,45 @@ fun ExpensesDetailScreen(
                 )
 
                 var category by rememberSaveable {
-                    mutableStateOf("")
+                    mutableStateOf(ExpenseCategory.Rent)
                 }
-                TextField(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                    value = category, onValueChange = {
-                        category = it
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.expenses_details_category))
+                var expanded by rememberSaveable {
+                    mutableStateOf(false)
+                }
+                val icon =
+                    if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+                val items = ExpenseCategory.values()
+
+                Column {
+                    TextField(
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        value = category.name, onValueChange = {
+                            category = ExpenseCategory.valueOf(it)
+                        },
+                        label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
+                        trailingIcon = {
+                            Icon(imageVector = icon, contentDescription = null,
+                                modifier = Modifier.clickable { expanded = !expanded })
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = expanded, onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items.forEach { expenseCategory ->
+                            DropdownMenuItem(onClick = {
+                                category = expenseCategory
+                                expanded = false
+                            }) {
+                                Text(expenseCategory.name)
+                            }
+                        }
                     }
-                )
+                }
 
                 val currentDate = Calendar.getInstance().time
                 var date by rememberSaveable {

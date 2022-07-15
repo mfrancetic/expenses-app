@@ -8,6 +8,6 @@ data class Expense(
     val id: String,
     val title: String,
     val amount: String,
-    val category: String,
+    val category: ExpenseCategory,
     val date: String
 ): Parcelable

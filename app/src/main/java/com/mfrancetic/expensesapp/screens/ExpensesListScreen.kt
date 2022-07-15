@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 
 // region UI
@@ -90,6 +91,7 @@ fun ExpenseCard(expense: Expense, modifier: Modifier = Modifier) {
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = expense.title)
                 Text(text = expense.amount)
             }
+            Text(text = expense.category.name)
             Text(text = expense.date)
         }
     }
@@ -116,7 +118,7 @@ fun ExpenseCardPreview() {
         ExpenseCard(
             expense = Expense(
                 id = "1", title = "Groceries", amount = "12.24€",
-                category = "Basics", date = "15.07.2022"
+                category = ExpenseCategory.Entertainment, date = "15.07.2022"
             )
         )
     }
