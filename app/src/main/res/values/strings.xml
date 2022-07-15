@@ -3,5 +3,14 @@
 
     <!-- ExpensesListScreen -->
     <string name="expenses_list_header">List of Expenses</string>
-    <string name="add_expense">Add expense</string>
+    <string name="expenses_list_add_expense_button">Add expense</string>
+
+    <!-- ExpensesDetailScreen -->
+    <string name="expenses_details_header">New expense</string>
+    <string name="expenses_details_up_button">Back to list of expenses</string>
+    <string name="expenses_details_title">Title</string>
+    <string name="expenses_details_amount">Amount</string>
+    <string name="expenses_details_category">Category</string>
+    <string name="expenses_details_date">Date</string>
+    <string name="expenses_details_save">Save</string>
 </resources>

@@ -13,7 +13,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
@@ -61,12 +60,19 @@ class ExpensesActivity : ComponentActivity() {
         ) {
             composable(route = NavigationDestination.ExpensesListScreen.name) {
                 ExpensesListScreen(viewModel = viewModel,
-                navigateToExpensesDetailScreen = {
-                    navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
-                })
+                    navigateToExpensesDetailScreen = {
+                        navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
+                    })
             }
             composable(NavigationDestination.ExpensesDetailScreen.name) {
-                ExpensesDetailScreen()
+                ExpensesDetailScreen(
+                    viewModel = viewModel,
+                    onUpButtonClicked = {
+                        navController.navigateUp()
+                    },
+                    onSaveButtonClicked = { expense ->
+                        viewModel.onSaveButtonClicked(expense) }
+                )
             }
         }
 
