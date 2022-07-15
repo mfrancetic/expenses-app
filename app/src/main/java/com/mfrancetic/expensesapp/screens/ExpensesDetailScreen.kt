@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
@@ -31,7 +32,8 @@ import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpensesSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.UUID
 
 @Composable
 fun ExpensesDetailScreen(
@@ -65,85 +67,98 @@ fun ExpensesDetailScreen(
             }
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxWidth()
-        ) {
-            val calendar = Calendar.getInstance()
-            val currentDate = calendar.time
-
-            val expense = Expense(
-                id = UUID.randomUUID().toString(),
-                title = "",
-                amount = "0.00",
-                category = "",
-                date = SimpleDateFormat.getDateInstance().format(currentDate)
-            )
-
-            var title by rememberSaveable {
-                mutableStateOf(expense.title)
-            }
-            TextField(
-                value = title, onValueChange = {
-                    title = it
-                },
-                label = {
-                    Text(text = stringResource(id = R.string.expenses_details_title))
+        Surface(modifier = Modifier.padding(innerPadding)) {
+            Column(
+                modifier = Modifier
+                    .padding(8.dp)
+            ) {
+                var title by rememberSaveable {
+                    mutableStateOf("")
                 }
-            )
-
-            var amount by rememberSaveable {
-                mutableStateOf(expense.amount)
-            }
-            TextField(
-                value = amount, onValueChange = {
-                    amount = it
-                },
-                label = {
-                    Text(text = stringResource(id = R.string.expenses_details_amount))
-                },
-                trailingIcon = {
-                    Text(text = "€")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-
-            var category by rememberSaveable {
-                mutableStateOf(expense.category)
-            }
-            TextField(
-                value = category, onValueChange = {
-                    category = it
-                },
-                label = {
-                    Text(text = stringResource(id = R.string.expenses_details_category))
-                }
-            )
-
-            var date by rememberSaveable {
-                mutableStateOf(
-                    SimpleDateFormat.getDateInstance().format(currentDate)
-
+                TextField(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                    value = title, onValueChange = {
+                        title = it
+                    },
+                    label = {
+                        Text(text = stringResource(id = R.string.expenses_details_title))
+                    },
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.expenses_details_title_placeholder))
+                    }
                 )
-            }
-            TextField(
-                value = date, onValueChange = {
-                    date = it
-                },
-                label = {
-                    Text(text = stringResource(id = R.string.expenses_details_date))
+
+                var amount by rememberSaveable {
+                    mutableStateOf("")
                 }
-            )
-            Button(modifier = Modifier.fillMaxWidth(), onClick = {
-                onSaveButtonClicked.invoke(
-                    expense.copy(
-                        title = title, amount = amount, category = category,
-                        date = date
-                    )
+                TextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    value = amount, onValueChange = {
+                        val decimalPlaces = it.substringAfter(",", "").length
+                        if (decimalPlaces <= 2) {
+                            amount = it
+                        }
+                    },
+                    label = {
+                        Text(text = stringResource(id = R.string.expenses_details_amount))
+                    },
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
+                    },
+                    trailingIcon = {
+                        Text(text = "€")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-            }) {
-                Text(text = stringResource(id = R.string.expenses_details_save))
+
+                var category by rememberSaveable {
+                    mutableStateOf("")
+                }
+                TextField(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                    value = category, onValueChange = {
+                        category = it
+                    },
+                    label = {
+                        Text(text = stringResource(id = R.string.expenses_details_category))
+                    }
+                )
+
+                val currentDate = Calendar.getInstance().time
+                var date by rememberSaveable {
+                    mutableStateOf("")
+                }
+                TextField(
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    value = date, onValueChange = {
+                        date = it
+                    },
+                    label = {
+                        Text(text = stringResource(id = R.string.expenses_details_date))
+                    },
+                    placeholder = {
+                        Text(text = SimpleDateFormat.getDateInstance().format(currentDate))
+                    }
+                )
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        onSaveButtonClicked.invoke(
+                            Expense(
+                                id = UUID.randomUUID().toString(),
+                                title = title, amount = amount, category = category,
+                                date = date
+                            )
+                        )
+                    }) {
+                    Text(text = stringResource(id = R.string.expenses_details_save))
+                }
             }
         }
     }

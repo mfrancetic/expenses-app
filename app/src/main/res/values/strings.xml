@@ -13,4 +13,8 @@
     <string name="expenses_details_category">Category</string>
     <string name="expenses_details_date">Date</string>
     <string name="expenses_details_save">Save</string>
+
+    <string name="expenses_details_title_placeholder">Groceries</string>
+    <string name="expenses_details_amount_placeholder">10,00</string>
+    <string name="expenses_details_date_placeholder">Date</string>
 </resources>
