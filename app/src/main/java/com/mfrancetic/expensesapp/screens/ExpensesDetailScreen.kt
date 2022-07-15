@@ -1,19 +1,16 @@
 package com.mfrancetic.expensesapp.screens
 
+import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.util.Size
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -21,18 +18,17 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,9 +39,10 @@ import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.UUID
+import java.util.*
+
 
 @Composable
 fun ExpensesDetailScreen(
@@ -171,9 +168,25 @@ fun ExpensesDetailScreen(
                 var date by rememberSaveable {
                     mutableStateOf("")
                 }
+
+                val context = LocalContext.current
+
                 TextField(
                     readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val calendar = Calendar.getInstance()
+                            val datePicker = DatePickerDialog(context)
+                            datePicker
+                                .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                                    calendar.set(year, monthOfYear, dayOfMonth)
+                                    date =
+                                        DateFormat.getDateInstance().format(calendar.timeInMillis)
+                                }
+                            datePicker.show()
+                        },
                     value = date, onValueChange = {
                         date = it
                     },
@@ -181,7 +194,14 @@ fun ExpensesDetailScreen(
                         Text(text = stringResource(id = R.string.expenses_details_date))
                     },
                     placeholder = {
-                        Text(text = SimpleDateFormat.getDateInstance().format(currentDate))
+                        Text(
+                            text = SimpleDateFormat
+                                .getDateInstance()
+                                .format(currentDate)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = null)
                     }
                 )
 
@@ -190,7 +210,9 @@ fun ExpensesDetailScreen(
                     onClick = {
                         onSaveButtonClicked.invoke(
                             Expense(
-                                id = UUID.randomUUID().toString(),
+                                id = UUID
+                                    .randomUUID()
+                                    .toString(),
                                 title = title, amount = amount, category = category,
                                 date = date
                             )
