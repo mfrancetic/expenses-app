@@ -43,6 +43,7 @@ import java.util.*
 @Composable
 fun ExpensesDetailScreen(
     expense: Expense,
+    isSaveButtonEnabled: Boolean,
     onExpenseUpdated: (Expense) -> Unit,
     onUpButtonClicked: () -> Unit,
     onSaveButtonClicked: (Expense) -> Unit,
@@ -60,42 +61,42 @@ fun ExpensesDetailScreen(
                 modifier = Modifier
                     .padding(8.dp)
             ) {
-                var newExpense by rememberSaveable {
-                    mutableStateOf(expense)
-                }
-
                 ExpensesDetailTitleTextField(
-                    title = newExpense.title,
+                    title = expense.title,
                     onTitleUpdated = { newTitle ->
-                        newExpense = newExpense.copy(title = newTitle)
+                        onExpenseUpdated(expense.copy(title = newTitle))
                     })
 
                 ExpensesDetailAmountTextField(
-                    amount = newExpense.amount,
+                    amount = expense.amount,
                     onAmountUpdated = { newAmount ->
-                        val decimalPlaces = newAmount.substringAfter(",", "").length
-                        if (decimalPlaces <= 2) {
-                            newExpense = newExpense.copy(amount = newAmount)
+                        val decimalPlacesComma = newAmount.substringAfter(",", "").length
+                        val decimalPlacesDot = newAmount.substringAfter(".", "").length
+                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2)) {
+                            onExpenseUpdated(expense.copy(amount = newAmount))
                         }
                     })
 
                 ExpensesDetailCategoryTextField(
-                    category = newExpense.category,
+                    category = expense.category,
                     onCategoryUpdated = { newCategory ->
-                        newExpense = newExpense.copy(category = newCategory)
+                        onExpenseUpdated(expense.copy(category = newCategory))
                     })
 
                 ExpensesDetailDateTextField(
-                    date = newExpense.date,
+                    date = expense.date,
                     onDateUpdated = { newDate ->
-                        newExpense = newExpense.copy(
-                            date = newDate
+                        onExpenseUpdated(
+                            expense.copy(
+                                date = newDate
+                            )
                         )
                     })
 
-                ExpensesDetailScreenSaveButton(onSaveButtonClicked = {
-                    onSaveButtonClicked.invoke(newExpense)
-                })
+                ExpensesDetailScreenSaveButton(
+                    isSaveButtonEnabled = isSaveButtonEnabled, onSaveButtonClicked = {
+                        onSaveButtonClicked.invoke(expense)
+                    })
             }
         }
     }
@@ -209,6 +210,7 @@ fun ExpensesDetailDateTextField(date: Long, onDateUpdated: (Long) -> Unit) {
     TextField(
         readOnly = true,
         enabled = false,
+        singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
@@ -239,9 +241,10 @@ fun ExpensesDetailDateTextField(date: Long, onDateUpdated: (Long) -> Unit) {
 }
 
 @Composable
-fun ExpensesDetailScreenSaveButton(onSaveButtonClicked: () -> Unit) {
+fun ExpensesDetailScreenSaveButton(isSaveButtonEnabled: Boolean, onSaveButtonClicked: () -> Unit) {
     Button(
         modifier = Modifier.fillMaxWidth(),
+        enabled = isSaveButtonEnabled,
         onClick = {
             onSaveButtonClicked()
         }) {
@@ -260,6 +263,7 @@ fun ExpensesDetailScreenPreview() {
             "0", "title", "10.00", ExpenseCategory.Rent,
             100L
         ),
+            isSaveButtonEnabled = false,
             onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {})
     }
 }
