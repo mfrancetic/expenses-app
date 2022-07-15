@@ -62,18 +62,10 @@ fun ExpensesDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar {
-                Icon(imageVector =
-                Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.expenses_details_up_button),
-                    modifier = Modifier.clickable {
-                        onUpButtonClicked.invoke()
-                    })
-                Text(
-                    modifier = Modifier.padding(start = 8.dp),
-                    text = stringResource(id = R.string.expenses_details_header)
-                )
-            }
+            ExpensesDetailScreenTopAppBar(
+                onUpButtonClicked =
+                { onUpButtonClicked.invoke() }
+            )
         }
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
@@ -84,144 +76,202 @@ fun ExpensesDetailScreen(
                 var title by rememberSaveable {
                     mutableStateOf("")
                 }
-                TextField(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                    value = title, onValueChange = {
-                        title = it
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.expenses_details_title))
-                    },
-                    placeholder = {
-                        Text(text = stringResource(id = R.string.expenses_details_title_placeholder))
-                    }
-                )
+                ExpensesDetailTitleTextField(title = title, onTitleUpdated = { newTitle ->
+                    title = newTitle
+                })
 
                 var amount by rememberSaveable {
                     mutableStateOf("")
                 }
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    value = amount, onValueChange = {
-                        val decimalPlaces = it.substringAfter(",", "").length
-                        if (decimalPlaces <= 2) {
-                            amount = it
-                        }
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.expenses_details_amount))
-                    },
-                    placeholder = {
-                        Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
-                    },
-                    trailingIcon = {
-                        Text(text = "€")
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
+                ExpensesDetailAmountTextField(amount = amount, onAmountUpdated = { newAmount ->
+                    val decimalPlaces = newAmount.substringAfter(",", "").length
+                    if (decimalPlaces <= 2) {
+                        amount = newAmount
+                    }
+                })
 
                 var category by rememberSaveable {
                     mutableStateOf(ExpenseCategory.Rent)
                 }
-                var expanded by rememberSaveable {
-                    mutableStateOf(false)
-                }
-                val icon =
-                    if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
-                val items = ExpenseCategory.values()
+                ExpensesDetailCategoryTextField(
+                    category = category,
+                    onCategoryUpdated = { newCategory ->
+                        category = newCategory
+                    })
 
-                Column {
-                    TextField(
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        value = category.name, onValueChange = {
-                            category = ExpenseCategory.valueOf(it)
-                        },
-                        label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
-                        trailingIcon = {
-                            Icon(imageVector = icon, contentDescription = null,
-                                modifier = Modifier.clickable { expanded = !expanded })
-                        }
-                    )
-
-                    DropdownMenu(
-                        expanded = expanded, onDismissRequest = { expanded = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items.forEach { expenseCategory ->
-                            DropdownMenuItem(onClick = {
-                                category = expenseCategory
-                                expanded = false
-                            }) {
-                                Text(expenseCategory.name)
-                            }
-                        }
-                    }
-                }
-
-                val currentDate = Calendar.getInstance().time
                 var date by rememberSaveable {
                     mutableStateOf("")
                 }
+                ExpensesDetailDateTextField(date = date, onDateUpdated = { newDate ->
+                    date = newDate
+                })
 
-                val context = LocalContext.current
+                ExpensesDetailScreenSaveButton(onSaveButtonClicked = {
+                    val expense = Expense(
+                        id = UUID
+                            .randomUUID()
+                            .toString(),
+                        title = title, amount = amount, category = category,
+                        date = SimpleDateFormat.getDateInstance().parse(date)?.time
+                            ?: Calendar.getInstance().timeInMillis
+                    )
+                    onSaveButtonClicked.invoke(expense)
+                })
+            }
+        }
+    }
+}
 
-                TextField(
-                    readOnly = true,
-                    enabled = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            val calendar = Calendar.getInstance()
-                            val datePicker = DatePickerDialog(context)
-                            datePicker
-                                .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                                    calendar.set(year, monthOfYear, dayOfMonth)
-                                    date =
-                                        DateFormat.getDateInstance().format(calendar.timeInMillis)
-                                }
-                            datePicker.show()
-                        },
-                    value = date, onValueChange = {
-                        date = it
-                    },
-                    label = {
-                        Text(text = stringResource(id = R.string.expenses_details_date))
-                    },
-                    placeholder = {
-                        Text(
-                            text = SimpleDateFormat
-                                .getDateInstance()
-                                .format(currentDate)
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = null)
-                    }
-                )
+@Composable
+fun ExpensesDetailScreenTopAppBar(onUpButtonClicked: () -> Unit) {
+    TopAppBar {
+        Icon(imageVector =
+        Icons.Filled.ArrowBack,
+            contentDescription = stringResource(id = R.string.expenses_details_up_button),
+            modifier = Modifier.clickable {
+                onUpButtonClicked()
+            })
+        Text(
+            modifier = Modifier.padding(start = 8.dp),
+            text = stringResource(id = R.string.expenses_details_header)
+        )
+    }
+}
 
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        onSaveButtonClicked.invoke(
-                            Expense(
-                                id = UUID
-                                    .randomUUID()
-                                    .toString(),
-                                title = title, amount = amount, category = category,
-                                date = date
-                            )
-                        )
-                    }) {
-                    Text(text = stringResource(id = R.string.expenses_details_save))
+@Composable
+fun ExpensesDetailTitleTextField(title: String, onTitleUpdated: (String) -> Unit) {
+    TextField(modifier = Modifier
+        .fillMaxWidth()
+        .padding(bottom = 8.dp),
+        value = title, onValueChange = {
+            onTitleUpdated(it)
+        },
+        label = {
+            Text(text = stringResource(id = R.string.expenses_details_title))
+        },
+        placeholder = {
+            Text(text = stringResource(id = R.string.expenses_details_title_placeholder))
+        }
+    )
+}
+
+@Composable
+fun ExpensesDetailAmountTextField(amount: String, onAmountUpdated: (String) -> Unit) {
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        value = amount, onValueChange = {
+            onAmountUpdated(it)
+        },
+        label = {
+            Text(text = stringResource(id = R.string.expenses_details_amount))
+        },
+        placeholder = {
+            Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
+        },
+        trailingIcon = {
+            Text(text = "€")
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+    )
+}
+
+@Composable
+fun ExpensesDetailCategoryTextField(
+    category: ExpenseCategory,
+    onCategoryUpdated: (ExpenseCategory) -> Unit
+) {
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val icon =
+        if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+    val items = ExpenseCategory.values()
+
+    Column {
+        TextField(
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            value = category.name, onValueChange = {
+                onCategoryUpdated(ExpenseCategory.valueOf(it))
+            },
+            label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
+            trailingIcon = {
+                Icon(imageVector = icon, contentDescription = null,
+                    modifier = Modifier.clickable { expanded = !expanded })
+            }
+        )
+
+        DropdownMenu(
+            expanded = expanded, onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items.forEach { expenseCategory ->
+                DropdownMenuItem(onClick = {
+                    onCategoryUpdated(expenseCategory)
+                    expanded = false
+                }) {
+                    Text(expenseCategory.name)
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ExpensesDetailDateTextField(date: String, onDateUpdated: (String) -> Unit) {
+    val context = LocalContext.current
+    val currentDate = Calendar.getInstance().time
+
+    TextField(
+        readOnly = true,
+        enabled = false,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                val calendar = Calendar.getInstance()
+                val datePicker = DatePickerDialog(context)
+                datePicker
+                    .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                        calendar.set(year, monthOfYear, dayOfMonth)
+                        onDateUpdated(
+                            DateFormat
+                                .getDateInstance()
+                                .format(calendar.timeInMillis)
+                        )
+                    }
+                datePicker.show()
+            },
+        value = date, onValueChange = {
+            onDateUpdated(it)
+        },
+        label = {
+            Text(text = stringResource(id = R.string.expenses_details_date))
+        },
+        placeholder = {
+            Text(
+                text = SimpleDateFormat
+                    .getDateInstance()
+                    .format(currentDate)
+            )
+        },
+        trailingIcon = {
+            Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = null)
+        }
+    )
+}
+
+@Composable
+fun ExpensesDetailScreenSaveButton(onSaveButtonClicked: () -> Unit){
+    Button(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = {
+            onSaveButtonClicked()
+        }) {
+        Text(text = stringResource(id = R.string.expenses_details_save))
     }
 }
 

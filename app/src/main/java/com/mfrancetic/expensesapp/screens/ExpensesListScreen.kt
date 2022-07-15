@@ -33,6 +33,9 @@ import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 // region UI
 
@@ -92,7 +95,7 @@ fun ExpenseCard(expense: Expense, modifier: Modifier = Modifier) {
                 Text(text = expense.amount)
             }
             Text(text = expense.category.name)
-            Text(text = expense.date)
+            Text(text = SimpleDateFormat.getDateInstance().format(expense.date))
         }
     }
 }
@@ -118,7 +121,7 @@ fun ExpenseCardPreview() {
         ExpenseCard(
             expense = Expense(
                 id = "1", title = "Groceries", amount = "12.24€",
-                category = ExpenseCategory.Entertainment, date = "15.07.2022"
+                category = ExpenseCategory.Entertainment, date = Calendar.getInstance().timeInMillis
             )
         )
     }

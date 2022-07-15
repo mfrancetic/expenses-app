@@ -9,5 +9,5 @@ data class Expense(
     val title: String,
     val amount: String,
     val category: ExpenseCategory,
-    val date: String
+    val date: Long
 ): Parcelable
