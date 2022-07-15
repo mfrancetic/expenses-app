@@ -10,16 +10,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import com.mfrancetic.expensesapp.utils.NavigationDestination
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.DateFormat
+import java.util.UUID
 
 @AndroidEntryPoint
 class ExpensesActivity : ComponentActivity() {
@@ -48,11 +53,12 @@ class ExpensesActivity : ComponentActivity() {
 
     @Composable
     fun ExpensesApp() {
-        val viewModel = hiltViewModel<ExpensesListViewModel>()
+        val expensesListViewModel = hiltViewModel<ExpensesListViewModel>()
+        val expensesDetailViewModel = hiltViewModel<ExpensesDetailViewModel>()
         val navController = rememberNavController()
 
         LaunchedEffect(true) {
-            viewModel.container.sideEffectFlow.collect { sideEffect ->
+            expensesListViewModel.container.sideEffectFlow.collect { sideEffect ->
                 when (sideEffect) {
                     ExpensesListSideEffect.NavigateBack ->
                         navController.navigateUp()
@@ -60,31 +66,38 @@ class ExpensesActivity : ComponentActivity() {
             }
         }
 
-        NavigationNavHost(navController = navController, viewModel = viewModel)
+        NavigationNavHost(
+            navController = navController, expensesListViewModel = expensesListViewModel,
+            expensesDetailViewModel = expensesDetailViewModel
+        )
     }
 
     @Composable
     fun NavigationNavHost(
         navController: NavHostController,
-        viewModel: ExpensesListViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+        expensesListViewModel: ExpensesListViewModel = viewModel(),
+        expensesDetailViewModel: ExpensesDetailViewModel = viewModel()
     ) {
         NavHost(
             navController = navController,
             startDestination = NavigationDestination.ExpensesListScreen.name
         ) {
             composable(route = NavigationDestination.ExpensesListScreen.name) {
-                ExpensesListScreen(viewModel = viewModel,
+                ExpensesListScreen(viewModel = expensesListViewModel,
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
                     })
             }
             composable(NavigationDestination.ExpensesDetailScreen.name) {
                 ExpensesDetailScreen(
+                    expense = Expense(id = UUID.randomUUID().toString(),
+                    "", "", ExpenseCategory.Rent, System.currentTimeMillis()),
+                    onExpenseUpdated = {},
                     onUpButtonClicked = {
                         navController.navigateUp()
                     },
                     onSaveButtonClicked = { expense ->
-                        viewModel.onSaveButtonClicked(expense)
+                        expensesListViewModel.onSaveButtonClicked(expense)
                     }
                 )
             }

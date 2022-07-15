@@ -6,8 +6,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Expense(
     val id: String,
-    val title: String,
-    val amount: String,
-    val category: ExpenseCategory,
-    val date: Long
+    var title: String,
+    var amount: String,
+    var category: ExpenseCategory,
+    var date: Long
 ): Parcelable

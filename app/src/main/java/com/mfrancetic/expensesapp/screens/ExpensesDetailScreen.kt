@@ -36,13 +36,14 @@ import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 @Composable
 fun ExpensesDetailScreen(
+    expense: Expense,
+    onExpenseUpdated: (Expense) -> Unit,
     onUpButtonClicked: () -> Unit,
     onSaveButtonClicked: (Expense) -> Unit,
 ) {
@@ -59,49 +60,41 @@ fun ExpensesDetailScreen(
                 modifier = Modifier
                     .padding(8.dp)
             ) {
-                var title by rememberSaveable {
-                    mutableStateOf("")
+                var newExpense by rememberSaveable {
+                    mutableStateOf(expense)
                 }
-                ExpensesDetailTitleTextField(title = title, onTitleUpdated = { newTitle ->
-                    title = newTitle
-                })
 
-                var amount by rememberSaveable {
-                    mutableStateOf("")
-                }
-                ExpensesDetailAmountTextField(amount = amount, onAmountUpdated = { newAmount ->
-                    val decimalPlaces = newAmount.substringAfter(",", "").length
-                    if (decimalPlaces <= 2) {
-                        amount = newAmount
-                    }
-                })
-
-                var category by rememberSaveable {
-                    mutableStateOf(ExpenseCategory.Rent)
-                }
-                ExpensesDetailCategoryTextField(
-                    category = category,
-                    onCategoryUpdated = { newCategory ->
-                        category = newCategory
+                ExpensesDetailTitleTextField(
+                    title = newExpense.title,
+                    onTitleUpdated = { newTitle ->
+                        newExpense = newExpense.copy(title = newTitle)
                     })
 
-                var date by rememberSaveable {
-                    mutableStateOf("")
-                }
-                ExpensesDetailDateTextField(date = date, onDateUpdated = { newDate ->
-                    date = newDate
-                })
+                ExpensesDetailAmountTextField(
+                    amount = newExpense.amount,
+                    onAmountUpdated = { newAmount ->
+                        val decimalPlaces = newAmount.substringAfter(",", "").length
+                        if (decimalPlaces <= 2) {
+                            newExpense = newExpense.copy(amount = newAmount)
+                        }
+                    })
+
+                ExpensesDetailCategoryTextField(
+                    category = newExpense.category,
+                    onCategoryUpdated = { newCategory ->
+                        newExpense = newExpense.copy(category = newCategory)
+                    })
+
+                ExpensesDetailDateTextField(
+                    date = newExpense.date,
+                    onDateUpdated = { newDate ->
+                        newExpense = newExpense.copy(
+                            date = newDate
+                        )
+                    })
 
                 ExpensesDetailScreenSaveButton(onSaveButtonClicked = {
-                    val expense = Expense(
-                        id = UUID
-                            .randomUUID()
-                            .toString(),
-                        title = title, amount = amount, category = category,
-                        date = SimpleDateFormat.getDateInstance().parse(date)?.time
-                            ?: Calendar.getInstance().timeInMillis
-                    )
-                    onSaveButtonClicked.invoke(expense)
+                    onSaveButtonClicked.invoke(newExpense)
                 })
             }
         }
@@ -208,9 +201,10 @@ fun ExpensesDetailCategoryTextField(
 }
 
 @Composable
-fun ExpensesDetailDateTextField(date: String, onDateUpdated: (String) -> Unit) {
+fun ExpensesDetailDateTextField(date: Long, onDateUpdated: (Long) -> Unit) {
     val context = LocalContext.current
-    val currentDate = Calendar.getInstance().time
+    val currentDate = System.currentTimeMillis()
+    val calendar = Calendar.getInstance()
 
     TextField(
         readOnly = true,
@@ -218,21 +212,15 @@ fun ExpensesDetailDateTextField(date: String, onDateUpdated: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                val calendar = Calendar.getInstance()
                 val datePicker = DatePickerDialog(context)
                 datePicker
                     .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                         calendar.set(year, monthOfYear, dayOfMonth)
-                        onDateUpdated(
-                            DateFormat
-                                .getDateInstance()
-                                .format(calendar.timeInMillis)
-                        )
+                        onDateUpdated(calendar.timeInMillis)
                     }
                 datePicker.show()
             },
-        value = date, onValueChange = {
-            onDateUpdated(it)
+        value = SimpleDateFormat.getDateInstance().format(date), onValueChange = {
         },
         label = {
             Text(text = stringResource(id = R.string.expenses_details_date))
@@ -268,7 +256,11 @@ fun ExpensesDetailScreenSaveButton(onSaveButtonClicked: () -> Unit) {
 @Composable
 fun ExpensesDetailScreenPreview() {
     ExpensesAppTheme {
-        ExpensesDetailScreen(onUpButtonClicked = {}, onSaveButtonClicked = {})
+        ExpensesDetailScreen(expense = Expense(
+            "0", "title", "10.00", ExpenseCategory.Rent,
+            100L
+        ),
+            onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {})
     }
 }
 

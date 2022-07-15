@@ -16,18 +16,17 @@ import javax.inject.Inject
 class ExpensesListViewModel @Inject constructor() : ViewModel(),
     ContainerHost<ExpensesListState, ExpensesListSideEffect> {
 
-    private var expenses = mutableListOf<Expense>()
-
     override val container =
         container<ExpensesListState, ExpensesListSideEffect>(ExpensesListState(expenses = emptyList()))
 
     // region Public Interface
 
     fun onSaveButtonClicked(expense: Expense) = intent {
+        val expenses = state.expenses.toMutableList()
         expenses.add(expense)
 
         reduce {
-            state.copy(expenses = expenses.toList())
+            state.copy(expenses = expenses)
         }
 
         postSideEffect(ExpensesListSideEffect.NavigateBack)
