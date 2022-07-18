@@ -4,6 +4,9 @@
     <!-- ExpensesListScreen -->
     <string name="expenses_list_header">List of Expenses</string>
     <string name="expenses_list_add_expense_button">Add expense</string>
+    <string name="expenses_list_delete_expense">Delete expense</string>
+    <string name="expenses_list_expense_deleted_success">Expense deleted successfully</string>
+    <string name="expenses_list_expense_deleted_failure">Failure to delete expense</string>
 
     <!-- ExpensesDetailScreen -->
     <string name="expenses_details_header">New expense</string>

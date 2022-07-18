@@ -70,6 +70,9 @@ class ExpensesActivity : ComponentActivity() {
         ) {
             composable(route = NavigationDestination.ExpensesListScreen.name) {
                 ExpensesListScreen(viewModel = expensesListViewModel,
+                    onDeleteExpenseButtonClicked = { expense ->
+                        expensesListViewModel.deleteExpense(expense)
+                    },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
                     })

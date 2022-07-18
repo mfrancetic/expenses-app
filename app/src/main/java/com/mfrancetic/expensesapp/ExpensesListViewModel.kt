@@ -1,37 +1,54 @@
 package com.mfrancetic.expensesapp
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
-import com.mfrancetic.expensesapp.preferences.ExpensePreferences
+import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
-class ExpensesListViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel(),
-    ContainerHost<ExpensesListState, Unit> {
-
-    private val expensePreferences = ExpensePreferences(context)
+class ExpensesListViewModel @Inject constructor(
+    private val expensesDataStore: ExpensesDataStore
+) : ViewModel(),
+    ContainerHost<ExpensesListState, ExpensesListSideEffect> {
 
     override val container =
-        container<ExpensesListState, Unit>(ExpensesListState(expenses = emptyList()))
+        container<ExpensesListState, ExpensesListSideEffect>(ExpensesListState(expenses = emptyList()))
 
     init {
         fetchExpenses()
     }
 
+    // region Public Interface
+
+    fun deleteExpense(expense: Expense) = intent {
+        viewModelScope.launch {
+            val isExpenseDeleted = expensesDataStore.deleteExpense(expense)
+
+            postSideEffect(
+                if (isExpenseDeleted)
+                    ExpensesListSideEffect.DisplayExpensesDeletedSuccess
+                else ExpensesListSideEffect.DisplayExpensesDeletedFailure
+            )
+        }
+    }
+
+    // endregion
+
     // region Private Helper Methods
 
     private fun fetchExpenses() = intent {
         viewModelScope.launch {
-            expensePreferences.fetchExpenses().collect { expenses ->
+            expensesDataStore.fetchExpenses().collect { expenses ->
                 reduce {
                     state.copy(expenses = expenses ?: emptyList())
                 }

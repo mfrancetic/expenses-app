@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-class ExpensePreferences(
+class ExpensesDataStore(
     private val context: Context
 ) {
 
@@ -23,22 +23,42 @@ class ExpensePreferences(
         val EXPENSES = stringPreferencesKey("key_expenses")
     }
 
+    private val gson: Gson = Gson()
     private val itemType = object : TypeToken<List<Expense>>() {}.type
+
+    // region Public Interface
 
     suspend fun saveExpense(expense: Expense) {
         context.dataStore.edit { preferences ->
             val expenses = fetchExpenses().first()?.toMutableList() ?: mutableListOf()
             expenses.add(expense)
-            preferences[EXPENSES] = Gson().toJson(expenses, itemType)
+            preferences[EXPENSES] = gson.toJson(expenses, itemType)
         }
+    }
+
+    suspend fun deleteExpense(expense: Expense): Boolean {
+        val expenses = fetchExpenses().first()?.toMutableList() ?: mutableListOf()
+        val isExpenseDeleted = expenses.remove(expense)
+
+        context.dataStore.edit { preferences ->
+            preferences[EXPENSES] = gson.toJson(expenses, itemType)
+        }
+
+        return isExpenseDeleted
     }
 
     fun fetchExpenses(): Flow<List<Expense>?> = context.dataStore.data
         .catch { exception ->
             emit(emptyPreferences())
-            Log.e(ExpensePreferences::class.java.name, "Exception while fetching expenses: $exception")
+            Log.e(
+                ExpensesDataStore::class.java.name,
+                "Exception while fetching expenses: $exception"
+            )
         }
         .map { preferences ->
-            Gson().fromJson(preferences[EXPENSES], itemType)
+            gson.fromJson(preferences[EXPENSES], itemType)
         }
+
+
+    // endregion
 }

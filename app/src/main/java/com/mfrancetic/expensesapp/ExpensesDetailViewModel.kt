@@ -1,14 +1,12 @@
 package com.mfrancetic.expensesapp
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesDetailState
-import com.mfrancetic.expensesapp.preferences.ExpensePreferences
+import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
 import com.mfrancetic.expensesapp.utils.ExpenseData.initialExpense
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -17,11 +15,11 @@ import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
-class ExpensesDetailViewModel @Inject constructor(@ApplicationContext context: Context) :
+class ExpensesDetailViewModel @Inject constructor(
+    private val expensesDataStore: ExpensesDataStore
+) :
     ViewModel(),
     ContainerHost<ExpensesDetailState, ExpensesDetailSideEffect> {
-
-    private val expensePreferences = ExpensePreferences(context)
 
     override val container = container<ExpensesDetailState, ExpensesDetailSideEffect>(
         ExpensesDetailState(
@@ -36,7 +34,7 @@ class ExpensesDetailViewModel @Inject constructor(@ApplicationContext context: C
     }
 
     fun onSaveButtonClicked(expense: Expense) = intent {
-        expensePreferences.saveExpense(expense)
+        expensesDataStore.saveExpense(expense)
 
         reduce {
             state.copy(expense = initialExpense)
