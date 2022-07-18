@@ -17,15 +17,17 @@ import javax.inject.Inject
 class ExpensesDetailViewModel @Inject constructor() : ViewModel(),
     ContainerHost<ExpensesDetailState, ExpensesListSideEffect> {
 
+    private val initialExpense: Expense = Expense(
+        id = UUID.randomUUID().toString(),
+        title = "",
+        amount = "",
+        category = ExpenseCategory.Rent,
+        date = System.currentTimeMillis()
+    )
+
     override val container = container<ExpensesDetailState, ExpensesListSideEffect>(
         ExpensesDetailState(
-            expense = Expense(
-                id = UUID.randomUUID().toString(),
-                title = "",
-                amount = "",
-                category = ExpenseCategory.Rent,
-                date = System.currentTimeMillis()
-            )
+            expense = initialExpense
         )
     )
 
@@ -35,8 +37,15 @@ class ExpensesDetailViewModel @Inject constructor() : ViewModel(),
         }
     }
 
+    fun onSaveButtonClicked(expense: Expense) = intent {
+        reduce {
+            state.copy(expense = initialExpense)
+        }
+    }
+
     private fun isExpenseValid(expense: Expense): Boolean {
         return expense.amount.isNotBlank() &&
                 expense.title.isNotBlank() && expense.date != 0L
     }
+
 }

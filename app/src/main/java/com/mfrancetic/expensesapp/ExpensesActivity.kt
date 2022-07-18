@@ -100,6 +100,7 @@ class ExpensesActivity : ComponentActivity() {
                         navController.navigateUp()
                     },
                     onSaveButtonClicked = { newExpense ->
+                        expensesDetailViewModel.onSaveButtonClicked(newExpense)
                         expensesListViewModel.onSaveButtonClicked(newExpense)
                     }
                 )

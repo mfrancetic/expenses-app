@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
@@ -27,8 +28,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -75,13 +81,15 @@ fun ExpensesDetailScreen(
                         if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2)) {
                             onExpenseUpdated(expense.copy(amount = newAmount))
                         }
-                    })
+                    },
+                    onSaveButtonClicked = { onSaveButtonClicked.invoke(expense) }
+                )
 
                 ExpensesDetailCategoryTextField(
-                    category = expense.category,
-                    onCategoryUpdated = { newCategory ->
-                        onExpenseUpdated(expense.copy(category = newCategory))
-                    })
+                    category = expense.category
+                ) { newCategory ->
+                    onExpenseUpdated(expense.copy(category = newCategory))
+                }
 
                 ExpensesDetailDateTextField(
                     date = expense.date,
@@ -91,7 +99,8 @@ fun ExpensesDetailScreen(
                                 date = newDate
                             )
                         )
-                    })
+                    }
+                )
 
                 ExpensesDetailScreenSaveButton(
                     isSaveButtonEnabled = isSaveButtonEnabled, onSaveButtonClicked = {
@@ -119,10 +128,16 @@ fun ExpensesDetailScreenTopAppBar(onUpButtonClicked: () -> Unit) {
 }
 
 @Composable
-fun ExpensesDetailTitleTextField(title: String, onTitleUpdated: (String) -> Unit) {
-    TextField(modifier = Modifier
-        .fillMaxWidth()
-        .padding(bottom = 8.dp),
+fun ExpensesDetailTitleTextField(
+    title: String,
+    onTitleUpdated: (String) -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    TextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         value = title, onValueChange = {
             onTitleUpdated(it)
         },
@@ -131,13 +146,25 @@ fun ExpensesDetailTitleTextField(title: String, onTitleUpdated: (String) -> Unit
         },
         placeholder = {
             Text(text = stringResource(id = R.string.expenses_details_title_placeholder))
-        }
+        },
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(onNext = {
+            focusManager.moveFocus(FocusDirection.Down)
+        })
     )
 }
 
 @Composable
-fun ExpensesDetailAmountTextField(amount: String, onAmountUpdated: (String) -> Unit) {
+fun ExpensesDetailAmountTextField(
+    amount: String,
+    onAmountUpdated: (String) -> Unit,
+    onSaveButtonClicked: () -> Unit
+) {
     TextField(
+        singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
@@ -153,7 +180,13 @@ fun ExpensesDetailAmountTextField(amount: String, onAmountUpdated: (String) -> U
         trailingIcon = {
             Text(text = "€")
         },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(onNext = {
+            onSaveButtonClicked()
+        })
     )
 }
 
@@ -202,7 +235,10 @@ fun ExpensesDetailCategoryTextField(
 }
 
 @Composable
-fun ExpensesDetailDateTextField(date: Long, onDateUpdated: (Long) -> Unit) {
+fun ExpensesDetailDateTextField(
+    date: Long,
+    onDateUpdated: (Long) -> Unit,
+) {
     val context = LocalContext.current
     val currentDate = System.currentTimeMillis()
     val calendar = Calendar.getInstance()
@@ -260,7 +296,7 @@ fun ExpensesDetailScreenSaveButton(isSaveButtonEnabled: Boolean, onSaveButtonCli
 fun ExpensesDetailScreenPreview() {
     ExpensesAppTheme {
         ExpensesDetailScreen(expense = Expense(
-            "0", "title", "10.00", ExpenseCategory.Rent,
+            "0", "Title", "10.00", ExpenseCategory.Rent,
             100L
         ),
             isSaveButtonEnabled = false,
