@@ -7,18 +7,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.NavigationConstants.EXPENSE_KEY
 import com.mfrancetic.expensesapp.utils.NavigationDestination
+import com.mfrancetic.expensesapp.utils.NavigationUtils.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,28 +50,30 @@ class ExpensesActivity : ComponentActivity() {
 
     @Composable
     fun ExpensesApp() {
-        val expensesListViewModel = hiltViewModel<ExpensesListViewModel>()
-        val expensesDetailViewModel = hiltViewModel<ExpensesDetailViewModel>()
         val navController = rememberNavController()
 
         NavigationNavHost(
-            navController = navController, expensesListViewModel = expensesListViewModel,
-            expensesDetailViewModel = expensesDetailViewModel
+            navController = navController
         )
     }
 
     @Composable
     fun NavigationNavHost(
-        navController: NavHostController,
-        expensesListViewModel: ExpensesListViewModel = viewModel(),
-        expensesDetailViewModel: ExpensesDetailViewModel = viewModel()
+        navController: NavHostController
     ) {
         NavHost(
             navController = navController,
             startDestination = NavigationDestination.ExpensesListScreen.name
         ) {
             composable(route = NavigationDestination.ExpensesListScreen.name) {
+                val expensesListViewModel = hiltViewModel<ExpensesListViewModel>()
                 ExpensesListScreen(viewModel = expensesListViewModel,
+                    onEditExpenseButtonClicked = { expense ->
+                        navController.navigate(
+                            route = NavigationDestination.ExpensesDetailScreen.name,
+                            args = bundleOf(EXPENSE_KEY to expense)
+                        )
+                    },
                     onDeleteExpenseButtonClicked = { expense ->
                         expensesListViewModel.deleteExpense(expense)
                     },
@@ -79,13 +83,12 @@ class ExpensesActivity : ComponentActivity() {
             }
 
             composable(NavigationDestination.ExpensesDetailScreen.name) {
-                val expensesDetailState =
-                    expensesDetailViewModel.container.stateFlow.collectAsState().value
+                val expensesDetailViewModel = hiltViewModel<ExpensesDetailViewModel>()
+                val expense = it.arguments?.getParcelable<Expense>(EXPENSE_KEY)
+                expensesDetailViewModel.initWithExpense(expense)
 
                 ExpensesDetailScreen(
                     viewModel = expensesDetailViewModel,
-                    expense = expensesDetailState.expense,
-                    isSaveButtonEnabled = expensesDetailState.isSaveExpenseEnabled,
                     onExpenseUpdated = { newExpense ->
                         expensesDetailViewModel.onExpenseUpdated(newExpense)
                     },

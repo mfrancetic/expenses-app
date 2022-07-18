@@ -23,6 +23,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ import java.util.*
 @Composable
 fun ExpensesListScreen(
     viewModel: ExpensesListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
@@ -86,9 +88,14 @@ fun ExpensesListScreen(
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(expenses) { expense ->
-                ExpenseCard(expense = expense) {
-                    onDeleteExpenseButtonClicked.invoke(expense)
-                }
+                ExpenseCard(
+                    expense = expense,
+                    onEditExpenseButtonClicked = { editedExpense ->
+                        onEditExpenseButtonClicked.invoke(editedExpense)
+                    },
+                    onDeleteExpenseButtonClicked = { deletedExpense ->
+                        onDeleteExpenseButtonClicked.invoke(deletedExpense)
+                    })
             }
         }
     }
@@ -97,6 +104,7 @@ fun ExpensesListScreen(
 @Composable
 fun ExpenseCard(
     expense: Expense, modifier: Modifier = Modifier,
+    onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit
 ) {
     Card(
@@ -126,6 +134,13 @@ fun ExpenseCard(
             horizontalAlignment = Alignment.End,
         ) {
             IconButton(
+                onClick = { onEditExpenseButtonClicked(expense) }) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = stringResource(id = R.string.expense_list_edit_expense_button)
+                )
+            }
+            IconButton(
                 onClick = { onDeleteExpenseButtonClicked(expense) }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
@@ -145,7 +160,10 @@ fun ExpenseCard(
 @Composable
 fun ExpensesListScreenPreview() {
     ExpensesAppTheme {
-        ExpensesListScreen(onDeleteExpenseButtonClicked = {}, navigateToExpensesDetailScreen = {})
+        ExpensesListScreen(
+            onEditExpenseButtonClicked = {},
+            onDeleteExpenseButtonClicked = {},
+            navigateToExpensesDetailScreen = {})
     }
 }
 
@@ -162,6 +180,7 @@ fun ExpenseCardPreview() {
                 category = ExpenseCategory.Entertainment,
                 date = Calendar.getInstance().timeInMillis
             ),
+            onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {}
         )
     }

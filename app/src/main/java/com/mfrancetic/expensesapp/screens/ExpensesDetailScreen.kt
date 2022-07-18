@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,13 +52,16 @@ import java.util.*
 @Composable
 fun ExpensesDetailScreen(
     viewModel: ExpensesDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    expense: Expense,
-    isSaveButtonEnabled: Boolean,
     onExpenseUpdated: (Expense) -> Unit,
     onUpButtonClicked: () -> Unit,
     onSaveButtonClicked: (Expense) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val expensesDetailState =
+        viewModel.container.stateFlow.collectAsState().value
+    val expense = expensesDetailState.expense
+    val isSaveButtonEnabled = expensesDetailState.isSaveExpenseEnabled
+
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
             when (sideEffect) {
@@ -308,11 +312,7 @@ fun ExpensesDetailScreenSaveButton(isSaveButtonEnabled: Boolean, onSaveButtonCli
 @Composable
 fun ExpensesDetailScreenPreview() {
     ExpensesAppTheme {
-        ExpensesDetailScreen(expense = Expense(
-            "0", "Title", "10.00", ExpenseCategory.Rent,
-            100L
-        ),
-            isSaveButtonEnabled = false,
+        ExpensesDetailScreen(
             onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {},
             onNavigateBack = {})
     }

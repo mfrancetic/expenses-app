@@ -27,6 +27,12 @@ class ExpensesDetailViewModel @Inject constructor(
         )
     )
 
+    fun initWithExpense(expense: Expense?) = intent {
+        reduce {
+            state.copy(expense = expense ?: initialExpense)
+        }
+    }
+
     fun onExpenseUpdated(expense: Expense) = intent {
         reduce {
             state.copy(expense = expense, isSaveExpenseEnabled = isExpenseValid(expense))
@@ -35,10 +41,6 @@ class ExpensesDetailViewModel @Inject constructor(
 
     fun onSaveButtonClicked(expense: Expense) = intent {
         expensesDataStore.saveExpense(expense)
-
-        reduce {
-            state.copy(expense = initialExpense)
-        }
 
         postSideEffect(ExpensesDetailSideEffect.NavigateBack)
     }

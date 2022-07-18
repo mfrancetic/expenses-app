@@ -30,8 +30,20 @@ class ExpensesDataStore(
 
     suspend fun saveExpense(expense: Expense) {
         context.dataStore.edit { preferences ->
-            val expenses = fetchExpenses().first()?.toMutableList() ?: mutableListOf()
-            expenses.add(expense)
+            var expenses = fetchExpenses().first()?.toMutableList() ?: mutableListOf()
+
+            expenses = expenses.map { expenseItem ->
+                if (expenseItem.id == expense.id) {
+                    expense
+                } else {
+                    expenseItem
+                }
+            }.toMutableList()
+
+            if (!expenses.contains(expense)){
+                expenses.add(expense)
+            }
+
             preferences[EXPENSES] = gson.toJson(expenses, itemType)
         }
     }
