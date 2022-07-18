@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,7 +15,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
@@ -54,15 +52,6 @@ class ExpensesActivity : ComponentActivity() {
         val expensesDetailViewModel = hiltViewModel<ExpensesDetailViewModel>()
         val navController = rememberNavController()
 
-        LaunchedEffect(true) {
-            expensesListViewModel.container.sideEffectFlow.collect { sideEffect ->
-                when (sideEffect) {
-                    ExpensesListSideEffect.NavigateBack ->
-                        navController.navigateUp()
-                }
-            }
-        }
-
         NavigationNavHost(
             navController = navController, expensesListViewModel = expensesListViewModel,
             expensesDetailViewModel = expensesDetailViewModel
@@ -91,6 +80,7 @@ class ExpensesActivity : ComponentActivity() {
                     expensesDetailViewModel.container.stateFlow.collectAsState().value
 
                 ExpensesDetailScreen(
+                    viewModel = expensesDetailViewModel,
                     expense = expensesDetailState.expense,
                     isSaveButtonEnabled = expensesDetailState.isSaveExpenseEnabled,
                     onExpenseUpdated = { newExpense ->
@@ -101,7 +91,9 @@ class ExpensesActivity : ComponentActivity() {
                     },
                     onSaveButtonClicked = { newExpense ->
                         expensesDetailViewModel.onSaveButtonClicked(newExpense)
-                        expensesListViewModel.onSaveButtonClicked(newExpense)
+                    },
+                    onNavigateBack = {
+                        navController.navigateUp()
                     }
                 )
             }

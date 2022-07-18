@@ -34,7 +34,7 @@ import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.util.*
 
 // region UI
 
@@ -45,24 +45,20 @@ fun ExpensesListScreen(
 ) {
     val expenses = viewModel.container.stateFlow.collectAsState().value.expenses
 
-    Scaffold(
-        topBar = {
-            TopAppBar {
-                Text(
-                    text = stringResource(id = R.string.expenses_list_header)
-                )
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigateToExpensesDetailScreen.invoke() }) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(id = R.string.expenses_list_add_expense_button)
-                )
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End
+    Scaffold(topBar = {
+        TopAppBar {
+            Text(
+                text = stringResource(id = R.string.expenses_list_header)
+            )
+        }
+    }, floatingActionButton = {
+        FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(id = R.string.expenses_list_add_expense_button)
+            )
+        }
+    }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
             items(expenses) { expense ->
@@ -82,8 +78,7 @@ fun ExpenseCard(expense: Expense, modifier: Modifier = Modifier) {
     ) {
         Column(modifier = Modifier.padding(4.dp)) {
             Row(
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
                     imageVector = Icons.Filled.ShoppingCart,
@@ -119,8 +114,11 @@ fun ExpenseCardPreview() {
     ExpensesAppTheme {
         ExpenseCard(
             expense = Expense(
-                id = "1", title = "Groceries", amount = "12.24€",
-                category = ExpenseCategory.Entertainment, date = Calendar.getInstance().timeInMillis
+                id = "1",
+                title = "Groceries",
+                amount = "12.24€",
+                category = ExpenseCategory.Entertainment,
+                date = Calendar.getInstance().timeInMillis
             )
         )
     }

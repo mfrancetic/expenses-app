@@ -1,31 +1,29 @@
 package com.mfrancetic.expensesapp
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.mfrancetic.expensesapp.models.Expense
-import com.mfrancetic.expensesapp.models.ExpenseCategory
+import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesDetailState
-import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
+import com.mfrancetic.expensesapp.preferences.ExpensePreferences
+import com.mfrancetic.expensesapp.utils.ExpenseData.initialExpense
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ExpensesDetailViewModel @Inject constructor() : ViewModel(),
-    ContainerHost<ExpensesDetailState, ExpensesListSideEffect> {
+class ExpensesDetailViewModel @Inject constructor(@ApplicationContext context: Context) :
+    ViewModel(),
+    ContainerHost<ExpensesDetailState, ExpensesDetailSideEffect> {
 
-    private val initialExpense: Expense = Expense(
-        id = UUID.randomUUID().toString(),
-        title = "",
-        amount = "",
-        category = ExpenseCategory.Rent,
-        date = System.currentTimeMillis()
-    )
+    private val expensePreferences = ExpensePreferences(context)
 
-    override val container = container<ExpensesDetailState, ExpensesListSideEffect>(
+    override val container = container<ExpensesDetailState, ExpensesDetailSideEffect>(
         ExpensesDetailState(
             expense = initialExpense
         )
@@ -38,14 +36,17 @@ class ExpensesDetailViewModel @Inject constructor() : ViewModel(),
     }
 
     fun onSaveButtonClicked(expense: Expense) = intent {
+        expensePreferences.saveExpense(expense)
+
         reduce {
             state.copy(expense = initialExpense)
         }
+
+        postSideEffect(ExpensesDetailSideEffect.NavigateBack)
     }
 
     private fun isExpenseValid(expense: Expense): Boolean {
         return expense.amount.isNotBlank() &&
                 expense.title.isNotBlank() && expense.date != 0L
     }
-
 }

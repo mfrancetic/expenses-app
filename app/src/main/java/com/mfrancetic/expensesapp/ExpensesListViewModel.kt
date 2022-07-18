@@ -1,36 +1,44 @@
 package com.mfrancetic.expensesapp
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.mfrancetic.expensesapp.models.Expense
-import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
+import androidx.lifecycle.viewModelScope
 import com.mfrancetic.expensesapp.models.ExpensesListState
+import com.mfrancetic.expensesapp.preferences.ExpensePreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
-class ExpensesListViewModel @Inject constructor() : ViewModel(),
-    ContainerHost<ExpensesListState, ExpensesListSideEffect> {
+class ExpensesListViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel(),
+    ContainerHost<ExpensesListState, Unit> {
+
+    private val expensePreferences = ExpensePreferences(context)
 
     override val container =
-        container<ExpensesListState, ExpensesListSideEffect>(ExpensesListState(expenses = emptyList()))
+        container<ExpensesListState, Unit>(ExpensesListState(expenses = emptyList()))
 
-    // region Public Interface
+    init {
+        fetchExpenses()
+    }
 
-    fun onSaveButtonClicked(expense: Expense) = intent {
-        val expenses = state.expenses.toMutableList()
-        expenses.add(expense)
+    // region Private Helper Methods
 
-        reduce {
-            state.copy(expenses = expenses)
+    private fun fetchExpenses() = intent {
+        viewModelScope.launch {
+            expensePreferences.fetchExpenses().collect { expenses ->
+                reduce {
+                    state.copy(expenses = expenses ?: emptyList())
+                }
+            }
         }
-
-        postSideEffect(ExpensesListSideEffect.NavigateBack)
     }
 
     // endregion
+
 }

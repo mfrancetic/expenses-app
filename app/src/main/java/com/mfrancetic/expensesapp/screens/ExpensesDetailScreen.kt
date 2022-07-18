@@ -23,13 +23,13 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -38,9 +38,11 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mfrancetic.expensesapp.ExpensesDetailViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
+import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,12 +50,23 @@ import java.util.*
 
 @Composable
 fun ExpensesDetailScreen(
+    viewModel: ExpensesDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     expense: Expense,
     isSaveButtonEnabled: Boolean,
     onExpenseUpdated: (Expense) -> Unit,
     onUpButtonClicked: () -> Unit,
     onSaveButtonClicked: (Expense) -> Unit,
+    onNavigateBack: () -> Unit
 ) {
+    LaunchedEffect(true) {
+        viewModel.container.sideEffectFlow.collect { sideEffect ->
+            when (sideEffect) {
+                ExpensesDetailSideEffect.NavigateBack ->
+                    onNavigateBack.invoke()
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             ExpensesDetailScreenTopAppBar(
@@ -300,7 +313,8 @@ fun ExpensesDetailScreenPreview() {
             100L
         ),
             isSaveButtonEnabled = false,
-            onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {})
+            onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {},
+            onNavigateBack = {})
     }
 }
 
