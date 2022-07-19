@@ -50,7 +50,7 @@ class ExpensesListViewModel @Inject constructor(
         viewModelScope.launch {
             expensesDataStore.fetchExpenses().collect { expenses ->
                 reduce {
-                    state.copy(expenses = expenses ?: emptyList())
+                    state.copy(expenses = expenses?.sortedByDescending { it.date } ?: emptyList())
                 }
             }
         }

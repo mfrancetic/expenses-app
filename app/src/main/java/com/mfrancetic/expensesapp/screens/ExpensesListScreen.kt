@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
@@ -87,18 +88,44 @@ fun ExpensesListScreen(
     }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(expenses) { expense ->
-                ExpenseCard(
-                    expense = expense,
-                    onEditExpenseButtonClicked = { editedExpense ->
-                        onEditExpenseButtonClicked.invoke(editedExpense)
-                    },
-                    onDeleteExpenseButtonClicked = { deletedExpense ->
-                        onDeleteExpenseButtonClicked.invoke(deletedExpense)
-                    })
+            itemsIndexed(expenses) { index, expense ->
+                var simpleDateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+                val month = simpleDateFormat.format(expense.date)
+                val previousMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
+                    simpleDateFormat.format(previousExpense.date)
+                }
+
+                simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
+                val year = simpleDateFormat.format(expense.date)
+
+                Column {
+                    if (previousMonth != month) {
+                        ExpenseHeader(title = "${month.uppercase()} $year")
+                    }
+                    ExpenseCard(
+                        expense = expense,
+                        onEditExpenseButtonClicked = { editedExpense ->
+                            onEditExpenseButtonClicked.invoke(editedExpense)
+                        },
+                        onDeleteExpenseButtonClicked = { deletedExpense ->
+                            onDeleteExpenseButtonClicked.invoke(deletedExpense)
+                        })
+                }
             }
         }
     }
+}
+
+@Composable
+fun ExpenseHeader(title: String) {
+    Text(
+        modifier = Modifier.padding(
+            horizontal = 8.dp,
+            vertical = 4.dp
+        ),
+        style = MaterialTheme.typography.h6,
+        text = title
+    )
 }
 
 @Composable
