@@ -169,7 +169,9 @@ fun ExpenseList(
     onDeleteExpenseButtonClicked: (Expense) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
-        itemsIndexed(expenses) { index, expense ->
+        itemsIndexed(items = expenses,
+            key = { _, expense -> expense.id }
+        ) { index, expense ->
             var simpleDateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
             val month = simpleDateFormat.format(expense.date)
             val previousMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
