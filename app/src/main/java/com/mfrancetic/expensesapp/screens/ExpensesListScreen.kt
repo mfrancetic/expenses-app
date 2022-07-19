@@ -24,9 +24,19 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CarRental
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ElectricCar
+import androidx.compose.material.icons.filled.House
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.MiscellaneousServices
+import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Paid
+import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,14 +48,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
@@ -201,11 +214,13 @@ fun ExpenseHeader(title: String, amount: Double) {
             .padding(top = 16.dp, bottom = 4.dp)
     ) {
         Text(
+            color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h6,
             text = title
         )
 
         Text(
+            color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h6,
             text = "Σ $amount€"
         )
@@ -224,39 +239,52 @@ fun ExpenseCard(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth()
-            ) {
+        Row(modifier = Modifier.padding(4.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                val categoryImage: ImageVector = when (expense.category) {
+                    ExpenseCategory.Rent -> Icons.Filled.House
+                    ExpenseCategory.Utilities -> Icons.Filled.Lightbulb
+                    ExpenseCategory.Groceries -> Icons.Filled.ShoppingCart
+                    ExpenseCategory.Entertainment -> Icons.Filled.MusicNote
+                    ExpenseCategory.Fuel -> Icons.Filled.ElectricCar
+                    ExpenseCategory.Other -> Icons.Filled.Payments
+                }
+
                 Image(
-                    imageVector = Icons.Filled.ShoppingCart,
+                    imageVector = categoryImage,
                     colorFilter = ColorFilter.tint(color = MaterialTheme.colors.onSurface),
                     contentDescription = null
                 )
-                Text(modifier = Modifier.padding(horizontal = 8.dp), text = expense.title)
-                Text(text = "${expense.amount}€")
             }
-
-            Text(text = expense.category.name)
-            Text(text = SimpleDateFormat.getDateInstance().format(expense.date))
-        }
-        Column(
-            modifier = Modifier.padding(4.dp),
-            horizontalAlignment = Alignment.End,
-        ) {
-            IconButton(
-                onClick = { onEditExpenseButtonClicked(expense) }) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = stringResource(id = R.string.expense_list_edit_expense_button_content_description)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = expense.title,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(text = stringResource(id = R.string.expenses_list_expense_amount) + ": ${expense.amount}€")
+                Text(
+                    text = stringResource(id = R.string.expenses_list_expense_date) + ": ${
+                        SimpleDateFormat.getDateInstance().format(expense.date)
+                    }"
                 )
             }
-            IconButton(
-                onClick = { onDeleteExpenseButtonClicked(expense) }) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = stringResource(id = R.string.expenses_list_delete_expense_button_content_description)
-                )
+            Column(
+                horizontalAlignment = Alignment.End,
+            ) {
+                IconButton(
+                    onClick = { onEditExpenseButtonClicked(expense) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = stringResource(id = R.string.expense_list_edit_expense_button_content_description)
+                    )
+                }
+                IconButton(
+                    onClick = { onDeleteExpenseButtonClicked(expense) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = stringResource(id = R.string.expenses_list_delete_expense_button_content_description)
+                    )
+                }
             }
         }
     }
@@ -285,7 +313,7 @@ fun ExpensesListScreenPreview() {
 fun ExpenseCardPreview() {
     ExpensesAppTheme {
         ExpenseCard(
-            expense = initialExpense,
+            expense = initialExpense.copy(title = "Groceries"),
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {}
         )
