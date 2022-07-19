@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.ExpensesAppSplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/orange</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.ExpensesApp</item>
+    </style>
+
     <style name="Theme.ExpensesApp" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:statusBarColor">@color/dark_orange</item>
     </style>
 </resources>

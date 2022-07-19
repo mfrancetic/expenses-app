@@ -32,8 +32,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
@@ -73,8 +73,11 @@ fun ExpensesListScreen(
     }
 
     Scaffold(topBar = {
-        TopAppBar {
+        TopAppBar(
+            backgroundColor = colorResource(id = R.color.orange)
+        ) {
             Text(
+                color = colorResource(id = R.color.white),
                 text = stringResource(id = R.string.expenses_list_header)
             )
         }
@@ -82,7 +85,7 @@ fun ExpensesListScreen(
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
             Icon(
                 imageVector = Icons.Filled.Add,
-                contentDescription = stringResource(id = R.string.expenses_list_add_expense_button)
+                contentDescription = stringResource(id = R.string.expenses_list_add_expense_button_content_description)
             )
         }
     }, floatingActionButtonPosition = FabPosition.End
@@ -135,7 +138,7 @@ fun ExpenseCard(
     onDeleteExpenseButtonClicked: (Expense) -> Unit
 ) {
     Card(
-        border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
+        border = BorderStroke(1.dp, MaterialTheme.colors.primary),
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -164,14 +167,14 @@ fun ExpenseCard(
                 onClick = { onEditExpenseButtonClicked(expense) }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
-                    contentDescription = stringResource(id = R.string.expense_list_edit_expense_button)
+                    contentDescription = stringResource(id = R.string.expense_list_edit_expense_button_content_description)
                 )
             }
             IconButton(
                 onClick = { onDeleteExpenseButtonClicked(expense) }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
-                    contentDescription = stringResource(id = R.string.expenses_list_delete_expense)
+                    contentDescription = stringResource(id = R.string.expenses_list_delete_expense_button_content_description)
                 )
             }
         }

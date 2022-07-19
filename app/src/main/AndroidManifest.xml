@@ -11,12 +11,12 @@
         android:name=".ExpensesApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ExpensesApp"
+        android:theme="@style/Theme.ExpensesAppSplashTheme"
         tools:targetApi="31">
         <activity
             android:name=".ExpensesActivity"
             android:exported="true"
-            android:theme="@style/Theme.ExpensesApp">
+            android:theme="@style/Theme.ExpensesAppSplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

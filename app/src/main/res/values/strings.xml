@@ -3,19 +3,21 @@
 
     <!-- ExpensesListScreen -->
     <string name="expenses_list_header">List of Expenses</string>
-    <string name="expenses_list_add_expense_button">Add expense</string>
-    <string name="expense_list_edit_expense_button">Edit expense</string>
-    <string name="expenses_list_delete_expense">Delete expense</string>
+    <string name="expenses_list_add_expense_button_content_description">Add expense</string>
+    <string name="expense_list_edit_expense_button_content_description">Edit expense</string>
+    <string name="expenses_list_delete_expense_button_content_description">Delete expense</string>
     <string name="expenses_list_expense_deleted_success">Expense deleted successfully</string>
     <string name="expenses_list_expense_deleted_failure">Failure to delete expense</string>
 
     <!-- ExpensesDetailScreen -->
     <string name="expenses_details_header">New expense</string>
-    <string name="expenses_details_up_button">Back to list of expenses</string>
+    <string name="expenses_details_up_button_content_description">Back to list of expenses</string>
     <string name="expenses_details_title">Title</string>
     <string name="expenses_details_amount">Amount</string>
     <string name="expenses_details_category">Category</string>
+    <string name="expenses_details_category_content_description">Update expense category</string>
     <string name="expenses_details_date">Date</string>
+    <string name="expenses_details_date_content_description">Update expense date</string>
     <string name="expenses_details_save">Save</string>
 
     <string name="expenses_details_title_placeholder">Groceries</string>

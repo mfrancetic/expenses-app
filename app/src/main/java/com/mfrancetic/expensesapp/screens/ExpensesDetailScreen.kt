@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -130,14 +131,20 @@ fun ExpensesDetailScreen(
 
 @Composable
 fun ExpensesDetailScreenTopAppBar(onUpButtonClicked: () -> Unit) {
-    TopAppBar {
-        Icon(imageVector =
-        Icons.Filled.ArrowBack,
-            contentDescription = stringResource(id = R.string.expenses_details_up_button),
+    TopAppBar(
+        backgroundColor = colorResource(id = R.color.orange)
+    ) {
+        Icon(
+            imageVector =
+            Icons.Filled.ArrowBack,
+            contentDescription = stringResource(id = R.string.expenses_details_up_button_content_description),
             modifier = Modifier.clickable {
                 onUpButtonClicked()
-            })
+            },
+            tint = colorResource(id = R.color.white)
+        )
         Text(
+            color = colorResource(id = R.color.white),
             modifier = Modifier.padding(start = 8.dp),
             text = stringResource(id = R.string.expenses_details_header)
         )
@@ -230,7 +237,7 @@ fun ExpensesDetailCategoryTextField(
             },
             label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
             trailingIcon = {
-                Icon(imageVector = icon, contentDescription = null,
+                Icon(imageVector = icon, contentDescription = stringResource(id = R.string.expenses_details_category_content_description),
                     modifier = Modifier.clickable { expanded = !expanded })
             }
         )
@@ -262,19 +269,9 @@ fun ExpensesDetailDateTextField(
 
     TextField(
         readOnly = true,
-        enabled = false,
         singleLine = true,
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                val datePicker = DatePickerDialog(context)
-                datePicker
-                    .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                        calendar.set(year, monthOfYear, dayOfMonth)
-                        onDateUpdated(calendar.timeInMillis)
-                    }
-                datePicker.show()
-            },
+            .fillMaxWidth(),
         value = SimpleDateFormat.getDateInstance().format(date), onValueChange = {
         },
         label = {
@@ -288,7 +285,16 @@ fun ExpensesDetailDateTextField(
             )
         },
         trailingIcon = {
-            Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = null)
+            Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = stringResource(id = R.string.expenses_details_date_content_description),
+                modifier = Modifier.clickable {
+                    val datePicker = DatePickerDialog(context)
+                    datePicker
+                        .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                            calendar.set(year, monthOfYear, dayOfMonth)
+                            onDateUpdated(calendar.timeInMillis)
+                        }
+                    datePicker.show()
+                })
         }
     )
 }
