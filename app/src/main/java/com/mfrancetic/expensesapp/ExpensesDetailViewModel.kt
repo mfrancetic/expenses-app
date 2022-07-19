@@ -1,11 +1,9 @@
 package com.mfrancetic.expensesapp
 
 import androidx.lifecycle.ViewModel
-import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesDetailState
-import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
-import com.mfrancetic.expensesapp.utils.ExpenseData.initialExpense
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -16,20 +14,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpensesDetailViewModel @Inject constructor(
-    private val expensesDataStore: ExpensesDataStore
+    private val expenseRepository: ExpenseRepository
 ) :
     ViewModel(),
     ContainerHost<ExpensesDetailState, ExpensesDetailSideEffect> {
 
     override val container = container<ExpensesDetailState, ExpensesDetailSideEffect>(
-        ExpensesDetailState(
-            expense = initialExpense
-        )
+        ExpensesDetailState(expense = Expense())
     )
 
     fun initWithExpense(expense: Expense?) = intent {
         reduce {
-            state.copy(expense = expense ?: initialExpense)
+            state.copy(expense = expense ?: Expense())
         }
     }
 
@@ -40,7 +36,7 @@ class ExpensesDetailViewModel @Inject constructor(
     }
 
     fun onSaveButtonClicked(expense: Expense) = intent {
-        expensesDataStore.saveExpense(expense)
+        expenseRepository.addExpense(expense)
 
         postSideEffect(ExpensesDetailSideEffect.NavigateBack)
     }

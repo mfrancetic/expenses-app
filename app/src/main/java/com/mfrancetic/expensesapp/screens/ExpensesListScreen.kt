@@ -24,18 +24,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CarRental
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.MiscellaneousServices
-import androidx.compose.material.icons.filled.Money
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Paid
-import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
@@ -57,12 +52,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
-import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
-import com.mfrancetic.expensesapp.utils.ExpenseData.initialExpense
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -315,7 +309,7 @@ fun ExpensesListScreenPreview() {
 fun ExpenseCardPreview() {
     ExpensesAppTheme {
         ExpenseCard(
-            expense = initialExpense.copy(title = "Groceries"),
+            expense = Expense(title = "Groceries"),
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {}
         )
@@ -327,7 +321,7 @@ fun ExpenseCardPreview() {
 @Composable
 fun ExpenseHeaderPreview() {
     ExpensesAppTheme {
-        ExpenseHeader(title = "Groceries", amount = initialExpense.amount)
+        ExpenseHeader(title = "Groceries", amount = Expense().amount)
     }
 }
 

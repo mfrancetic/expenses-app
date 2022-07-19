@@ -2,13 +2,12 @@ package com.mfrancetic.expensesapp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -19,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExpensesListViewModel @Inject constructor(
-    private val expensesDataStore: ExpensesDataStore
+    private val expensesDataStore: ExpensesDataStore,
+    private val expenseRepository: ExpenseRepository
 ) : ViewModel(),
     ContainerHost<ExpensesListState, ExpensesListSideEffect> {
 
@@ -36,15 +36,13 @@ class ExpensesListViewModel @Inject constructor(
     // region Public Interface
 
     fun deleteExpense(expense: Expense) = intent {
-        viewModelScope.launch {
-            val isExpenseDeleted = expensesDataStore.deleteExpense(expense)
+        val isExpenseDeleted = expenseRepository.deleteExpense(expense.id)
 
-            postSideEffect(
-                if (isExpenseDeleted)
-                    ExpensesListSideEffect.DisplayExpensesDeletedSuccess
-                else ExpensesListSideEffect.DisplayExpensesDeletedFailure
-            )
-        }
+        postSideEffect(
+            if (isExpenseDeleted)
+                ExpensesListSideEffect.DisplayExpensesDeletedSuccess
+            else ExpensesListSideEffect.DisplayExpensesDeletedFailure
+        )
     }
 
     fun updateSortMode(newSortMode: SortMode) = intent {
@@ -59,9 +57,9 @@ class ExpensesListViewModel @Inject constructor(
 
     private fun fetchExpenses() = intent {
         viewModelScope.launch {
-            expensesDataStore.fetchExpenses().collect { expenses ->
+            expenseRepository.fetchAllExpenses().collect { expenses ->
                 reduce {
-                    state.copy(expenses = expenses?.sorted() ?: emptyList())
+                    state.copy(expenses = expenses.sorted())
                 }
             }
         }

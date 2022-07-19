@@ -43,11 +43,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesDetailViewModel
 import com.mfrancetic.expensesapp.R
-import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 

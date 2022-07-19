@@ -9,8 +9,8 @@
     <string name="expenses_list_add_expense_button_content_description">Add expense</string>
     <string name="expense_list_edit_expense_button_content_description">Edit expense</string>
     <string name="expenses_list_delete_expense_button_content_description">Delete expense</string>
-    <string name="expenses_list_expense_deleted_success">Expense deleted successfully</string>
-    <string name="expenses_list_expense_deleted_failure">Failure to delete expense</string>
+    <string name="expenses_list_expense_deleted_success">Expense deleted</string>
+    <string name="expenses_list_expense_deleted_failure">Failed to delete expense</string>
     <string name="expenses_list_expense_amount">@string/expenses_details_amount</string>
     <string name="expenses_list_expense_date">@string/expenses_details_date</string>
 
