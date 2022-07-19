@@ -81,41 +81,10 @@ fun ExpensesListScreen(
         }
     }
 
-    var showMenu by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     Scaffold(topBar = {
-        TopAppBar(
-            backgroundColor = colorResource(id = R.color.orange)
-        ) {
-            Text(
-                color = colorResource(id = R.color.white),
-                text = stringResource(id = R.string.expenses_list_header)
-            )
-            IconButton(
-                onClick = { showMenu = !showMenu }) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(id = R.string.expenses_list_display_menu_content_description)
-                )
-            }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = !showMenu }) {
-                DropdownMenuItem(onClick = {
-                    onSortModeUpdated.invoke(SortMode.ExpenseDateDescending)
-                    showMenu = !showMenu
-                }) {
-                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_descending))
-                }
-                DropdownMenuItem(onClick = {
-                    onSortModeUpdated.invoke(SortMode.ExpenseDateAscending)
-                    showMenu = !showMenu
-                }
-                ) {
-                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
-                }
-            }
-        }
+        ExpensesListTopAppBar(onSortModeUpdated = { sortMode ->
+            onSortModeUpdated.invoke(sortMode)
+        })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
             Icon(
@@ -125,30 +94,90 @@ fun ExpensesListScreen(
         }
     }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            itemsIndexed(expenses) { index, expense ->
-                var simpleDateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
-                val month = simpleDateFormat.format(expense.date)
-                val previousMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
-                    simpleDateFormat.format(previousExpense.date)
-                }
+        ExpenseList(
+            modifier = Modifier.padding(innerPadding),
+            expenses = expenses,
+            onEditExpenseButtonClicked = { expense ->
+                onEditExpenseButtonClicked.invoke(expense)
+            },
+            onDeleteExpenseButtonClicked =  { expense ->
+                onDeleteExpenseButtonClicked.invoke(expense)
+            }
+        )
+    }
+}
 
-                simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
-                val year = simpleDateFormat.format(expense.date)
+@Composable
+fun ExpensesListTopAppBar(onSortModeUpdated: (SortMode) -> Unit) {
+    var showMenu by rememberSaveable {
+        mutableStateOf(false)
+    }
 
-                Column {
-                    if (previousMonth != month) {
-                        ExpenseHeader(title = "${month.uppercase()} $year")
-                    }
-                    ExpenseCard(
-                        expense = expense,
-                        onEditExpenseButtonClicked = { editedExpense ->
-                            onEditExpenseButtonClicked.invoke(editedExpense)
-                        },
-                        onDeleteExpenseButtonClicked = { deletedExpense ->
-                            onDeleteExpenseButtonClicked.invoke(deletedExpense)
-                        })
+    TopAppBar(
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        title = {
+            Text(
+                color = colorResource(id = R.color.white),
+                text = stringResource(id = R.string.expenses_list_header)
+            )
+        },
+        actions = {
+            IconButton(
+                onClick = { showMenu = !showMenu }) {
+                Icon(
+                    tint = colorResource(id = R.color.white),
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(id = R.string.expenses_list_display_menu_content_description)
+                )
+            }
+            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = !showMenu }) {
+                DropdownMenuItem(onClick = {
+                    onSortModeUpdated(SortMode.ExpenseDateDescending)
+                    showMenu = !showMenu
+                }) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_descending))
                 }
+                DropdownMenuItem(onClick = {
+                    onSortModeUpdated(SortMode.ExpenseDateAscending)
+                    showMenu = !showMenu
+                }
+                ) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ExpenseList(
+    modifier: Modifier, expenses: List<Expense>,
+    onEditExpenseButtonClicked: (Expense) -> Unit,
+    onDeleteExpenseButtonClicked: (Expense) -> Unit
+) {
+    LazyColumn(modifier = modifier) {
+        itemsIndexed(expenses) { index, expense ->
+            var simpleDateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+            val month = simpleDateFormat.format(expense.date)
+            val previousMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
+                simpleDateFormat.format(previousExpense.date)
+            }
+
+            simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
+            val year = simpleDateFormat.format(expense.date)
+
+            Column {
+                if (previousMonth != month) {
+                    ExpenseHeader(title = "${month.uppercase()} $year")
+                }
+                ExpenseCard(
+                    expense = expense,
+                    onEditExpenseButtonClicked = { editedExpense ->
+                        onEditExpenseButtonClicked(editedExpense)
+                    },
+                    onDeleteExpenseButtonClicked = { deletedExpense ->
+                        onDeleteExpenseButtonClicked(deletedExpense)
+                    })
             }
         }
     }

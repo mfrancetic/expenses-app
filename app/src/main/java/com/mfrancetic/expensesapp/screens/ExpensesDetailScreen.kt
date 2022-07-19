@@ -12,6 +12,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -132,23 +133,25 @@ fun ExpensesDetailScreen(
 @Composable
 fun ExpensesDetailScreenTopAppBar(onUpButtonClicked: () -> Unit) {
     TopAppBar(
-        backgroundColor = colorResource(id = R.color.orange)
-    ) {
-        Icon(
-            imageVector =
-            Icons.Filled.ArrowBack,
-            contentDescription = stringResource(id = R.string.expenses_details_up_button_content_description),
-            modifier = Modifier.clickable {
-                onUpButtonClicked()
-            },
-            tint = colorResource(id = R.color.white)
-        )
-        Text(
-            color = colorResource(id = R.color.white),
-            modifier = Modifier.padding(start = 8.dp),
-            text = stringResource(id = R.string.expenses_details_header)
-        )
-    }
+        title = {
+            Text(
+                color = colorResource(id = R.color.white),
+                text = stringResource(id = R.string.expenses_details_header)
+            )
+        },
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        navigationIcon = {
+            Icon(
+                imageVector =
+                Icons.Filled.ArrowBack,
+                contentDescription = stringResource(id = R.string.expenses_details_up_button_content_description),
+                modifier = Modifier.clickable {
+                    onUpButtonClicked()
+                },
+                tint = colorResource(id = R.color.white)
+            )
+        }
+    )
 }
 
 @Composable
@@ -237,7 +240,8 @@ fun ExpensesDetailCategoryTextField(
             },
             label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
             trailingIcon = {
-                Icon(imageVector = icon, contentDescription = stringResource(id = R.string.expenses_details_category_content_description),
+                Icon(imageVector = icon,
+                    contentDescription = stringResource(id = R.string.expenses_details_category_content_description),
                     modifier = Modifier.clickable { expanded = !expanded })
             }
         )
@@ -285,7 +289,8 @@ fun ExpensesDetailDateTextField(
             )
         },
         trailingIcon = {
-            Icon(imageVector = Icons.Filled.CalendarToday, contentDescription = stringResource(id = R.string.expenses_details_date_content_description),
+            Icon(imageVector = Icons.Filled.CalendarToday,
+                contentDescription = stringResource(id = R.string.expenses_details_date_content_description),
                 modifier = Modifier.clickable {
                     val datePicker = DatePickerDialog(context)
                     datePicker
