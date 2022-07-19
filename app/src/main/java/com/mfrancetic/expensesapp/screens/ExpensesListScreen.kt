@@ -46,10 +46,10 @@ import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
-import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.ExpenseData.initialExpense
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -100,7 +100,7 @@ fun ExpensesListScreen(
             onEditExpenseButtonClicked = { expense ->
                 onEditExpenseButtonClicked.invoke(expense)
             },
-            onDeleteExpenseButtonClicked =  { expense ->
+            onDeleteExpenseButtonClicked = { expense ->
                 onDeleteExpenseButtonClicked.invoke(expense)
             }
         )
@@ -163,12 +163,18 @@ fun ExpenseList(
                 simpleDateFormat.format(previousExpense.date)
             }
 
+            val monthlyExpenses = expenses.filter { simpleDateFormat.format(it.date) == month }
+            val monthlyExpensesSum = monthlyExpenses.sumOf { it.amount }
+
             simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
             val year = simpleDateFormat.format(expense.date)
 
             Column {
                 if (previousMonth != month) {
-                    ExpenseHeader(title = "${month.uppercase()} $year")
+                    ExpenseHeader(
+                        title = "${month.uppercase()} $year",
+                        amount = monthlyExpensesSum
+                    )
                 }
                 ExpenseCard(
                     expense = expense,
@@ -184,15 +190,26 @@ fun ExpenseList(
 }
 
 @Composable
-fun ExpenseHeader(title: String) {
-    Text(
-        modifier = Modifier.padding(
-            horizontal = 8.dp,
-            vertical = 4.dp
-        ),
-        style = MaterialTheme.typography.h6,
-        text = title
-    )
+fun ExpenseHeader(title: String, amount: Double) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 8.dp,
+            )
+            .padding(top = 16.dp, bottom = 4.dp)
+    ) {
+        Text(
+            style = MaterialTheme.typography.h6,
+            text = title
+        )
+
+        Text(
+            style = MaterialTheme.typography.h6,
+            text = "Σ $amount€"
+        )
+    }
 }
 
 @Composable
@@ -217,7 +234,7 @@ fun ExpenseCard(
                     contentDescription = null
                 )
                 Text(modifier = Modifier.padding(horizontal = 8.dp), text = expense.title)
-                Text(text = expense.amount)
+                Text(text = "${expense.amount}€")
             }
 
             Text(text = expense.category.name)
@@ -268,16 +285,19 @@ fun ExpensesListScreenPreview() {
 fun ExpenseCardPreview() {
     ExpensesAppTheme {
         ExpenseCard(
-            expense = Expense(
-                id = "1",
-                title = "Groceries",
-                amount = "12.24€",
-                category = ExpenseCategory.Entertainment,
-                date = Calendar.getInstance().timeInMillis
-            ),
+            expense = initialExpense,
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {}
         )
+    }
+}
+
+@Preview("ExpenseHeader light mode", showBackground = true)
+@Preview("ExpenseHeader dark mode", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun ExpenseHeaderPreview() {
+    ExpensesAppTheme {
+        ExpenseHeader(title = "Groceries", amount = initialExpense.amount)
     }
 }
 

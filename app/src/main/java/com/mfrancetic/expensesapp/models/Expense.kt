@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 data class Expense(
     val id: String,
     val title: String,
-    val amount: String,
+    val amount: Double,
     val category: ExpenseCategory,
     val date: Long
 ): Parcelable

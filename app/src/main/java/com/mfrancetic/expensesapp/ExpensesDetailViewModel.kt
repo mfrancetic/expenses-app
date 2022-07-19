@@ -46,7 +46,7 @@ class ExpensesDetailViewModel @Inject constructor(
     }
 
     private fun isExpenseValid(expense: Expense): Boolean {
-        return expense.amount.isNotBlank() &&
+        return expense.amount > 0 &&
                 expense.title.isNotBlank() && expense.date != 0L
     }
 }

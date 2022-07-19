@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.mfrancetic.expensesapp.models.Expense
+import com.mfrancetic.expensesapp.models.SortMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -21,6 +22,7 @@ class ExpensesDataStore(
     private companion object {
         val Context.dataStore by preferencesDataStore("preferences")
         val EXPENSES = stringPreferencesKey("key_expenses")
+        val SORT_MODE = stringPreferencesKey("key_sort_mode")
     }
 
     private val gson: Gson = Gson()
@@ -40,7 +42,7 @@ class ExpensesDataStore(
                 }
             }.toMutableList()
 
-            if (!expenses.contains(expense)){
+            if (!expenses.contains(expense)) {
                 expenses.add(expense)
             }
 
@@ -71,6 +73,25 @@ class ExpensesDataStore(
             gson.fromJson(preferences[EXPENSES], itemType)
         }
 
+    suspend fun updateSortMode(sortMode: SortMode) {
+        context.dataStore.edit { preferences ->
+            preferences[SORT_MODE] = sortMode.name
+        }
+    }
+
+    fun fetchSortMode(): Flow<SortMode?> = context.dataStore.data
+        .catch { exception ->
+            emit(emptyPreferences())
+            Log.e(
+                ExpensesDataStore::class.java.name,
+                "Exception while fetching expenses: $exception"
+            )
+        }
+        .map { preferences ->
+            preferences[SORT_MODE]?.let { sortModeValue ->
+                SortMode.valueOf(sortModeValue)
+            }
+        }
 
     // endregion
 }

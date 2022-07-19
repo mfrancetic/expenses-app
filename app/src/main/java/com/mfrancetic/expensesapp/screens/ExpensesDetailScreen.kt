@@ -47,6 +47,7 @@ import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -93,12 +94,13 @@ fun ExpensesDetailScreen(
                     })
 
                 ExpensesDetailAmountTextField(
-                    amount = expense.amount,
+                    amount = "${expense.amount}",
                     onAmountUpdated = { newAmount ->
                         val decimalPlacesComma = newAmount.substringAfter(",", "").length
                         val decimalPlacesDot = newAmount.substringAfter(".", "").length
-                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2)) {
-                            onExpenseUpdated(expense.copy(amount = newAmount))
+                        val newAmountDouble = newAmount.toDoubleOrNull()
+                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2) && newAmountDouble != null) {
+                            onExpenseUpdated(expense.copy(amount = newAmountDouble))
                         }
                     },
                     onSaveButtonClicked = { onSaveButtonClicked.invoke(expense) }

@@ -9,7 +9,7 @@ object ExpenseData {
     val initialExpense: Expense = Expense(
         id = UUID.randomUUID().toString(),
         title = "",
-        amount = "",
+        amount = 0.00,
         category = ExpenseCategory.Rent,
         date = System.currentTimeMillis()
     )
