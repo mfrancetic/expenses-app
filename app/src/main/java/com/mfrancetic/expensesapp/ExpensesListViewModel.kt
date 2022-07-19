@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
+import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,6 +21,8 @@ class ExpensesListViewModel @Inject constructor(
     private val expensesDataStore: ExpensesDataStore
 ) : ViewModel(),
     ContainerHost<ExpensesListState, ExpensesListSideEffect> {
+
+    private var sortMode: SortMode = SortMode.ExpenseDateDescending
 
     override val container =
         container<ExpensesListState, ExpensesListSideEffect>(ExpensesListState(expenses = emptyList()))
@@ -42,6 +45,14 @@ class ExpensesListViewModel @Inject constructor(
         }
     }
 
+    fun updateSortMode(newSortMode: SortMode) = intent {
+        sortMode = newSortMode
+
+        reduce {
+            state.copy(expenses = state.expenses.sorted())
+        }
+    }
+
     // endregion
 
     // region Private Helper Methods
@@ -50,10 +61,15 @@ class ExpensesListViewModel @Inject constructor(
         viewModelScope.launch {
             expensesDataStore.fetchExpenses().collect { expenses ->
                 reduce {
-                    state.copy(expenses = expenses?.sortedByDescending { it.date } ?: emptyList())
+                    state.copy(expenses = expenses?.sorted() ?: emptyList())
                 }
             }
         }
+    }
+
+    private fun List<Expense>.sorted(): List<Expense> {
+        return if (sortMode == SortMode.ExpenseDateDescending)
+            this.sortedByDescending { it.date } else this.sortedBy { it.date }
     }
 
     // endregion

@@ -80,6 +80,9 @@ class ExpensesActivity : ComponentActivity() {
                     onDeleteExpenseButtonClicked = { expense ->
                         expensesListViewModel.deleteExpense(expense)
                     },
+                    onSortModeUpdated = { sortMode ->
+                           expensesListViewModel.updateSortMode(sortMode)
+                    },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
                     })

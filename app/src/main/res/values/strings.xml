@@ -3,6 +3,9 @@
 
     <!-- ExpensesListScreen -->
     <string name="expenses_list_header">List of Expenses</string>
+    <string name="expenses_list_display_menu_content_description">Display menu</string>
+    <string name="expenses_list_menu_item_sort_by_expense_date_descending">Sort by expense date descending</string>
+    <string name="expenses_list_menu_item_sort_by_expense_date_ascending">Sort by expense date ascending</string>
     <string name="expenses_list_add_expense_button_content_description">Add expense</string>
     <string name="expense_list_edit_expense_button_content_description">Edit expense</string>
     <string name="expenses_list_delete_expense_button_content_description">Delete expense</string>

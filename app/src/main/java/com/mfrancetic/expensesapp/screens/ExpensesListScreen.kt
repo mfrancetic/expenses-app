@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -24,10 +26,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -41,6 +48,7 @@ import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
+import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,6 +60,7 @@ fun ExpensesListScreen(
     viewModel: ExpensesListViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
+    onSortModeUpdated: (SortMode) -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -72,6 +81,10 @@ fun ExpensesListScreen(
         }
     }
 
+    var showMenu by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Scaffold(topBar = {
         TopAppBar(
             backgroundColor = colorResource(id = R.color.orange)
@@ -80,6 +93,28 @@ fun ExpensesListScreen(
                 color = colorResource(id = R.color.white),
                 text = stringResource(id = R.string.expenses_list_header)
             )
+            IconButton(
+                onClick = { showMenu = !showMenu }) {
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(id = R.string.expenses_list_display_menu_content_description)
+                )
+            }
+            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = !showMenu }) {
+                DropdownMenuItem(onClick = {
+                    onSortModeUpdated.invoke(SortMode.ExpenseDateDescending)
+                    showMenu = !showMenu
+                }) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_descending))
+                }
+                DropdownMenuItem(onClick = {
+                    onSortModeUpdated.invoke(SortMode.ExpenseDateAscending)
+                    showMenu = !showMenu
+                }
+                ) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
+                }
+            }
         }
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
@@ -193,6 +228,7 @@ fun ExpensesListScreenPreview() {
         ExpensesListScreen(
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {},
+            onSortModeUpdated = {},
             navigateToExpensesDetailScreen = {})
     }
 }
