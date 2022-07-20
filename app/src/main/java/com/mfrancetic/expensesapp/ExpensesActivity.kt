@@ -81,7 +81,10 @@ class ExpensesActivity : ComponentActivity() {
                         expensesListViewModel.deleteExpense(expense)
                     },
                     onSortModeUpdated = { sortMode ->
-                           expensesListViewModel.updateSortMode(sortMode)
+                        expensesListViewModel.updateSortMode(sortMode)
+                    },
+                    onDownloadButtonClicked = {
+                        expensesListViewModel.downloadData()
                     },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)

@@ -25,9 +25,11 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.House
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
@@ -70,6 +72,7 @@ fun ExpensesListScreen(
     onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
     onSortModeUpdated: (SortMode) -> Unit,
+    onDownloadButtonClicked: () -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -78,6 +81,10 @@ fun ExpensesListScreen(
         stringResource(id = R.string.expenses_list_expense_deleted_success)
     val expenseDeletedFailureMessage =
         stringResource(id = R.string.expenses_list_expense_deleted_failure)
+    val expensesDataDownloadSuccessMessage =
+        stringResource(id = R.string.expenses_list_expenses_data_download_success)
+    val expensesDataDownloadFailureMessage =
+        stringResource(id = R.string.expenses_list_expenses_data_download_failure)
 
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
@@ -86,6 +93,10 @@ fun ExpensesListScreen(
                     Toast.makeText(context, expenseDeletedSuccessMessage, Toast.LENGTH_SHORT).show()
                 is ExpensesListSideEffect.DisplayExpensesDeletedFailure ->
                     Toast.makeText(context, expenseDeletedFailureMessage, Toast.LENGTH_SHORT).show()
+                is ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess ->
+                    Toast.makeText(context, expensesDataDownloadSuccessMessage, Toast.LENGTH_SHORT).show()
+                is ExpensesListSideEffect.DisplayExpensesDataDownloadFailure ->
+                    Toast.makeText(context, expensesDataDownloadFailureMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -93,6 +104,9 @@ fun ExpensesListScreen(
     Scaffold(topBar = {
         ExpensesListTopAppBar(onSortModeUpdated = { sortMode ->
             onSortModeUpdated.invoke(sortMode)
+        },
+        onDownloadButtonClicked = {
+            onDownloadButtonClicked.invoke()
         })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
@@ -117,7 +131,10 @@ fun ExpensesListScreen(
 }
 
 @Composable
-fun ExpensesListTopAppBar(onSortModeUpdated: (SortMode) -> Unit) {
+fun ExpensesListTopAppBar(
+    onSortModeUpdated: (SortMode) -> Unit,
+    onDownloadButtonClicked: () -> Unit
+) {
     var showMenu by rememberSaveable {
         mutableStateOf(false)
     }
@@ -131,6 +148,15 @@ fun ExpensesListTopAppBar(onSortModeUpdated: (SortMode) -> Unit) {
             )
         },
         actions = {
+            IconButton(onClick = {
+                onDownloadButtonClicked()
+            }) {
+                Icon(
+                    tint = colorResource(id = R.color.white),
+                    imageVector = Icons.Filled.Download,
+                    contentDescription = stringResource(id = R.string.expenses_list_menu_item_download)
+                )
+            }
             IconButton(
                 onClick = { showMenu = !showMenu }) {
                 Icon(
@@ -305,6 +331,7 @@ fun ExpensesListScreenPreview() {
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {},
             onSortModeUpdated = {},
+            onDownloadButtonClicked = {},
             navigateToExpensesDetailScreen = {})
     }
 }
@@ -327,8 +354,10 @@ fun ExpenseCardPreview() {
 @Composable
 fun ExpenseHeaderPreview() {
     ExpensesAppTheme {
-        ExpenseHeader(title = "Groceries", amount = 1524.665,
-        currency = ExpenseCurrency.HRK)
+        ExpenseHeader(
+            title = "Groceries", amount = 1524.665,
+            currency = ExpenseCurrency.HRK
+        )
     }
 }
 

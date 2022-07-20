@@ -3,10 +3,12 @@ package com.mfrancetic.expensesapp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mfrancetic.expensesapp.db.Expense
+import com.mfrancetic.expensesapp.db.ExpensesAppDatabase
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.preferences.ExpensesDataStore
+import com.mfrancetic.expensesapp.utils.ExportManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
@@ -19,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ExpensesListViewModel @Inject constructor(
     private val expensesDataStore: ExpensesDataStore,
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val expensesAppDatabase: ExpensesAppDatabase,
+    private val exportManager: ExportManager
 ) : ViewModel(),
     ContainerHost<ExpensesListState, ExpensesListSideEffect> {
 
@@ -49,6 +53,15 @@ class ExpensesListViewModel @Inject constructor(
         viewModelScope.launch {
             expensesDataStore.updateSortMode(newSortMode)
         }
+    }
+
+    fun downloadData() = intent {
+        val isDatabaseExported = exportManager.exportDatabase(expensesAppDatabase)
+
+        postSideEffect(
+            if (isDatabaseExported) ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess
+            else ExpensesListSideEffect.DisplayExpensesDataDownloadFailure
+        )
     }
 
     // endregion
