@@ -94,6 +94,7 @@ class ExpensesActivity : ComponentActivity() {
                 expensesDetailViewModel.initWithExpense(expense)
 
                 ExpensesDetailScreen(
+                    isEditMode = expense != null,
                     viewModel = expensesDetailViewModel,
                     onExpenseUpdated = { newExpense ->
                         expensesDetailViewModel.onExpenseUpdated(newExpense)

@@ -45,6 +45,7 @@ import com.mfrancetic.expensesapp.ExpensesDetailViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
+import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import java.text.SimpleDateFormat
@@ -53,6 +54,7 @@ import java.util.*
 
 @Composable
 fun ExpensesDetailScreen(
+    isEditMode: Boolean = false,
     viewModel: ExpensesDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     onExpenseUpdated: (Expense) -> Unit,
     onUpButtonClicked: () -> Unit,
@@ -76,6 +78,7 @@ fun ExpensesDetailScreen(
     Scaffold(
         topBar = {
             ExpensesDetailScreenTopAppBar(
+                isEditMode = isEditMode,
                 onUpButtonClicked =
                 { onUpButtonClicked.invoke() }
             )
@@ -94,6 +97,7 @@ fun ExpensesDetailScreen(
 
                 ExpensesDetailAmountTextField(
                     amount = "${expense.amount}",
+                    currency = expense.currency,
                     onAmountUpdated = { newAmount ->
                         val decimalPlacesComma = newAmount.substringAfter(",", "").length
                         val decimalPlacesDot = newAmount.substringAfter(".", "").length
@@ -132,12 +136,15 @@ fun ExpensesDetailScreen(
 }
 
 @Composable
-fun ExpensesDetailScreenTopAppBar(onUpButtonClicked: () -> Unit) {
+fun ExpensesDetailScreenTopAppBar(isEditMode: Boolean = false, onUpButtonClicked: () -> Unit) {
     TopAppBar(
         title = {
             Text(
                 color = colorResource(id = R.color.white),
-                text = stringResource(id = R.string.expenses_details_header)
+                text = stringResource(
+                    id = if (isEditMode) R.string.expenses_details_header_edit_expense
+                    else R.string.expenses_details_header_new_expense
+                )
             )
         },
         backgroundColor = MaterialTheme.colors.primaryVariant,
@@ -188,6 +195,7 @@ fun ExpensesDetailTitleTextField(
 @Composable
 fun ExpensesDetailAmountTextField(
     amount: String,
+    currency: ExpenseCurrency,
     onAmountUpdated: (String) -> Unit,
     onSaveButtonClicked: () -> Unit
 ) {
@@ -206,7 +214,7 @@ fun ExpensesDetailAmountTextField(
             Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
         },
         trailingIcon = {
-            Text(text = "€")
+            Text(text = currency.symbol)
         },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,

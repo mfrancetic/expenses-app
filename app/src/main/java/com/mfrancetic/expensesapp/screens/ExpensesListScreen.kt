@@ -54,9 +54,11 @@ import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpenseCategory
+import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.FormatUtils.formatCurrency
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -182,7 +184,8 @@ fun ExpenseList(
                 if (previousMonth != month) {
                     ExpenseHeader(
                         title = "${month.uppercase()} $year",
-                        amount = monthlyExpensesSum
+                        amount = monthlyExpensesSum,
+                        currency = expense.currency
                     )
                 }
                 ExpenseCard(
@@ -199,7 +202,7 @@ fun ExpenseList(
 }
 
 @Composable
-fun ExpenseHeader(title: String, amount: Double) {
+fun ExpenseHeader(title: String, amount: Double, currency: ExpenseCurrency) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -218,7 +221,7 @@ fun ExpenseHeader(title: String, amount: Double) {
         Text(
             color = MaterialTheme.colors.primary,
             style = MaterialTheme.typography.h6,
-            text = "Σ $amount€"
+            text = "Σ ${amount.formatCurrency(currency)}"
         )
     }
 }
@@ -257,7 +260,10 @@ fun ExpenseCard(
                     text = expense.title,
                     fontWeight = FontWeight.Bold
                 )
-                Text(text = stringResource(id = R.string.expenses_list_expense_amount) + ": ${expense.amount}€")
+                Text(
+                    text = stringResource(id = R.string.expenses_list_expense_amount) + ": " +
+                            expense.amount.formatCurrency(expense.currency)
+                )
                 Text(
                     text = stringResource(id = R.string.expenses_list_expense_date) + ": ${
                         SimpleDateFormat.getDateInstance().format(expense.date)
@@ -309,7 +315,7 @@ fun ExpensesListScreenPreview() {
 fun ExpenseCardPreview() {
     ExpensesAppTheme {
         ExpenseCard(
-            expense = Expense(title = "Groceries"),
+            expense = Expense(title = "Groceries", amount = 1524.665),
             onEditExpenseButtonClicked = {},
             onDeleteExpenseButtonClicked = {}
         )
@@ -321,7 +327,8 @@ fun ExpenseCardPreview() {
 @Composable
 fun ExpenseHeaderPreview() {
     ExpensesAppTheme {
-        ExpenseHeader(title = "Groceries", amount = Expense().amount)
+        ExpenseHeader(title = "Groceries", amount = 1524.665,
+        currency = ExpenseCurrency.HRK)
     }
 }
 

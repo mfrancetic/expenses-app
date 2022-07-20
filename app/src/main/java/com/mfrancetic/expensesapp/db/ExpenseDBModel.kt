@@ -5,6 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mfrancetic.expensesapp.models.ExpenseCategory
+import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 import javax.annotation.Nonnull
@@ -25,6 +26,10 @@ data class Expense(
     @ColumnInfo(name = "expenseAmount")
     @Nonnull
     var amount: Double = 0.0,
+
+    @ColumnInfo(name = "expenseCurrency")
+    @Nonnull
+    var currency: ExpenseCurrency = ExpenseCurrency.HRK,
 
     @ColumnInfo(name = "expenseCategory")
     @Nonnull

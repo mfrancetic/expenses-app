@@ -15,7 +15,8 @@
     <string name="expenses_list_expense_date">@string/expenses_details_date</string>
 
     <!-- ExpensesDetailScreen -->
-    <string name="expenses_details_header">New expense</string>
+    <string name="expenses_details_header_new_expense">New expense</string>
+    <string name="expenses_details_header_edit_expense">Edit expense</string>
     <string name="expenses_details_up_button_content_description">Back to list of expenses</string>
     <string name="expenses_details_title">Title</string>
     <string name="expenses_details_amount">Amount</string>
