@@ -5,8 +5,10 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -135,16 +137,28 @@ fun ExpensesListScreen(
         }
     }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
-        ExpenseList(
-            modifier = Modifier.padding(innerPadding),
-            expenses = expenses,
-            onEditExpenseButtonClicked = { expense ->
-                onEditExpenseButtonClicked.invoke(expense)
-            },
-            onDeleteExpenseButtonClicked = { expense ->
-                onDeleteExpenseButtonClicked.invoke(expense)
+        if (expenses.isEmpty()) {
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    style = MaterialTheme.typography.h6,
+                    text = stringResource(id = R.string.expenses_list_no_expenses_added)
+                )
             }
-        )
+        } else {
+            ExpenseList(
+                modifier = Modifier.padding(innerPadding),
+                expenses = expenses,
+                onEditExpenseButtonClicked = { expense ->
+                    onEditExpenseButtonClicked.invoke(expense)
+                },
+                onDeleteExpenseButtonClicked = { expense ->
+                    onDeleteExpenseButtonClicked.invoke(expense)
+                }
+            )
+        }
     }
 }
 

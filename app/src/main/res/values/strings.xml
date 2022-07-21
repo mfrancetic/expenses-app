@@ -26,6 +26,7 @@
     <string name="expenses_list_delete_all_expenses_dialog_text">Are you sure you want to delete all expenses?</string>
     <string name="expenses_list_delete_all_expenses_dialog_dismiss">Cancel</string>
     <string name="expenses_list_delete_all_expenses_dialog_confirm">Delete</string>
+    <string name="expenses_list_no_expenses_added">No expenses added</string>
 
     <!-- ExpensesDetailScreen -->
     <string name="expenses_details_header_new_expense">New expense</string>
