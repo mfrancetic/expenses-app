@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -21,6 +22,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -73,6 +75,7 @@ fun ExpensesListScreen(
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
+    onDeleteAllExpensesButtonClicked: () -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -81,6 +84,10 @@ fun ExpensesListScreen(
         stringResource(id = R.string.expenses_list_expense_deleted_success)
     val expenseDeletedFailureMessage =
         stringResource(id = R.string.expenses_list_expense_deleted_failure)
+    val allExpensesDeletedSuccessMessage =
+        stringResource(id = R.string.expenses_list_all_expenses_deleted_success)
+    val allExpensesDeletedFailureMessage =
+        stringResource(id = R.string.expenses_list_all_expenses_deleted_failure)
     val expensesDataDownloadSuccessMessage =
         stringResource(id = R.string.expenses_list_expenses_data_download_success)
     val expensesDataDownloadFailureMessage =
@@ -89,15 +96,21 @@ fun ExpensesListScreen(
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
             when (sideEffect) {
-                is ExpensesListSideEffect.DisplayExpensesDeletedSuccess ->
+                is ExpensesListSideEffect.DisplayExpenseDeletedSuccess ->
                     Toast.makeText(context, expenseDeletedSuccessMessage, Toast.LENGTH_SHORT).show()
-                is ExpensesListSideEffect.DisplayExpensesDeletedFailure ->
+                is ExpensesListSideEffect.DisplayExpenseDeletedFailure ->
                     Toast.makeText(context, expenseDeletedFailureMessage, Toast.LENGTH_SHORT).show()
                 is ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess ->
                     Toast.makeText(context, expensesDataDownloadSuccessMessage, Toast.LENGTH_SHORT)
                         .show()
                 is ExpensesListSideEffect.DisplayExpensesDataDownloadFailure ->
                     Toast.makeText(context, expensesDataDownloadFailureMessage, Toast.LENGTH_SHORT)
+                        .show()
+                is ExpensesListSideEffect.DisplayAllExpensesDeletedSuccess ->
+                    Toast.makeText(context, allExpensesDeletedSuccessMessage, Toast.LENGTH_SHORT)
+                        .show()
+                is ExpensesListSideEffect.DisplayAllExpensesDeletedFailure ->
+                    Toast.makeText(context, allExpensesDeletedFailureMessage, Toast.LENGTH_SHORT)
                         .show()
             }
         }
@@ -109,6 +122,9 @@ fun ExpensesListScreen(
         },
             onDownloadButtonClicked = { downloadFormat ->
                 onDownloadButtonClicked.invoke(downloadFormat)
+            },
+            onDeleteAllExpensesButtonClicked = {
+                onDeleteAllExpensesButtonClicked.invoke()
             })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
@@ -135,12 +151,16 @@ fun ExpensesListScreen(
 @Composable
 fun ExpensesListTopAppBar(
     onSortModeUpdated: (SortMode) -> Unit,
-    onDownloadButtonClicked: (DownloadFormat) -> Unit
+    onDownloadButtonClicked: (DownloadFormat) -> Unit,
+    onDeleteAllExpensesButtonClicked: () -> Unit
 ) {
     var showSortMenu by rememberSaveable {
         mutableStateOf(false)
     }
     var showDownloadMenu by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showDeleteAllExpensesAlertDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -203,6 +223,40 @@ fun ExpensesListTopAppBar(
                 ) {
                     Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
                 }
+            }
+            IconButton(onClick = {
+                showDeleteAllExpensesAlertDialog = !showDeleteAllExpensesAlertDialog
+            }) {
+                Icon(
+                    tint = colorResource(id = R.color.white),
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = stringResource(id = R.string.expenses_list_menu_item_delete_all_expenses)
+                )
+            }
+            if (showDeleteAllExpensesAlertDialog) {
+                AlertDialog(onDismissRequest = {
+                    showDeleteAllExpensesAlertDialog = false
+                },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onDeleteAllExpensesButtonClicked()
+                            showDeleteAllExpensesAlertDialog = false
+                        }) {
+                            Text(stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showDeleteAllExpensesAlertDialog = false
+                            }) {
+                            Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_dismiss))
+                        }
+                    },
+                    title = {
+                        Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_title))
+                    },
+                    text = { Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_text)) })
             }
         }
     )
@@ -356,6 +410,7 @@ fun ExpensesListScreenPreview() {
             onDeleteExpenseButtonClicked = {},
             onSortModeUpdated = {},
             onDownloadButtonClicked = {},
+            onDeleteAllExpensesButtonClicked = {},
             navigateToExpensesDetailScreen = {})
     }
 }
@@ -366,7 +421,8 @@ fun ExpensesListScreenPreview() {
 fun ExpensesListTopAppBarPreview() {
     ExpensesAppTheme {
         ExpensesListTopAppBar(onSortModeUpdated = {},
-            onDownloadButtonClicked = {})
+            onDownloadButtonClicked = {},
+            onDeleteAllExpensesButtonClicked = {})
     }
 }
 

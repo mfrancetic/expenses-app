@@ -1,6 +1,7 @@
 package com.mfrancetic.expensesapp.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
@@ -20,4 +21,7 @@ interface ExpenseDao {
 
     @Query("DELETE FROM expenses WHERE expenseId = :id")
     fun deleteExpense(id: String)
+
+    @Query("DELETE FROM expenses")
+    fun deleteAllExpenses()
 }

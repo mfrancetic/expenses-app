@@ -45,8 +45,8 @@ class ExpensesListViewModel @Inject constructor(
 
         postSideEffect(
             if (isExpenseDeleted)
-                ExpensesListSideEffect.DisplayExpensesDeletedSuccess
-            else ExpensesListSideEffect.DisplayExpensesDeletedFailure
+                ExpensesListSideEffect.DisplayExpenseDeletedSuccess
+            else ExpensesListSideEffect.DisplayExpenseDeletedFailure
         )
     }
 
@@ -61,6 +61,15 @@ class ExpensesListViewModel @Inject constructor(
 
         postSideEffect(
             if (isDatabaseExported) ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess
+            else ExpensesListSideEffect.DisplayExpensesDataDownloadFailure
+        )
+    }
+
+    fun deleteAllExpenses() = intent {
+        val areAllExpensesDeleted = expenseRepository.deleteAllExpenses()
+
+        postSideEffect(
+            if (areAllExpensesDeleted) ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess
             else ExpensesListSideEffect.DisplayExpensesDataDownloadFailure
         )
     }

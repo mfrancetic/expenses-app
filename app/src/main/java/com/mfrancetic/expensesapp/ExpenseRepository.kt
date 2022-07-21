@@ -18,4 +18,12 @@ class ExpenseRepository @Inject constructor(private val expenseDao: ExpenseDao) 
         return expenseDao.getExpenseById(id).isEmpty()
     }
 
+    suspend fun deleteAllExpenses(): Boolean {
+        expenseDao.deleteAllExpenses()
+        var areAllExpensesDeleted = false
+        expenseDao.getAllExpenses().collect {
+            areAllExpensesDeleted = it.isEmpty()
+        }
+        return areAllExpensesDeleted
+    }
 }

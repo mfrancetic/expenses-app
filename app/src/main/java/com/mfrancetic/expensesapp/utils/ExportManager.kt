@@ -27,7 +27,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.exp
 
 
 class ExportManager @Inject constructor(private val context: Context) {

@@ -86,6 +86,9 @@ class ExpensesActivity : ComponentActivity() {
                     onDownloadButtonClicked = { downloadFormat ->
                         expensesListViewModel.downloadData(downloadFormat)
                     },
+                    onDeleteAllExpensesButtonClicked = {
+                        expensesListViewModel.deleteAllExpenses()
+                    },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
                     })
