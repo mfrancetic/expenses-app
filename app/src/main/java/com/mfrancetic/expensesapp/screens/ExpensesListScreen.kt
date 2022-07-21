@@ -29,12 +29,11 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ElectricCar
 import androidx.compose.material.icons.filled.House
-import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.db.Expense
+import com.mfrancetic.expensesapp.models.DownloadFormat
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
@@ -72,7 +72,7 @@ fun ExpensesListScreen(
     onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
     onSortModeUpdated: (SortMode) -> Unit,
-    onDownloadButtonClicked: () -> Unit,
+    onDownloadButtonClicked: (DownloadFormat) -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -94,9 +94,11 @@ fun ExpensesListScreen(
                 is ExpensesListSideEffect.DisplayExpensesDeletedFailure ->
                     Toast.makeText(context, expenseDeletedFailureMessage, Toast.LENGTH_SHORT).show()
                 is ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess ->
-                    Toast.makeText(context, expensesDataDownloadSuccessMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, expensesDataDownloadSuccessMessage, Toast.LENGTH_SHORT)
+                        .show()
                 is ExpensesListSideEffect.DisplayExpensesDataDownloadFailure ->
-                    Toast.makeText(context, expensesDataDownloadFailureMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, expensesDataDownloadFailureMessage, Toast.LENGTH_SHORT)
+                        .show()
             }
         }
     }
@@ -105,9 +107,9 @@ fun ExpensesListScreen(
         ExpensesListTopAppBar(onSortModeUpdated = { sortMode ->
             onSortModeUpdated.invoke(sortMode)
         },
-        onDownloadButtonClicked = {
-            onDownloadButtonClicked.invoke()
-        })
+            onDownloadButtonClicked = { downloadFormat ->
+                onDownloadButtonClicked.invoke(downloadFormat)
+            })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
             Icon(
@@ -133,9 +135,12 @@ fun ExpensesListScreen(
 @Composable
 fun ExpensesListTopAppBar(
     onSortModeUpdated: (SortMode) -> Unit,
-    onDownloadButtonClicked: () -> Unit
+    onDownloadButtonClicked: (DownloadFormat) -> Unit
 ) {
-    var showMenu by rememberSaveable {
+    var showSortMenu by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showDownloadMenu by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -149,32 +154,51 @@ fun ExpensesListTopAppBar(
         },
         actions = {
             IconButton(onClick = {
-                onDownloadButtonClicked()
+                showDownloadMenu = !showDownloadMenu
             }) {
                 Icon(
                     tint = colorResource(id = R.color.white),
                     imageVector = Icons.Filled.Download,
-                    contentDescription = stringResource(id = R.string.expenses_list_menu_item_download)
+                    contentDescription = stringResource(id = R.string.expenses_list_display_download_menu_content_description)
                 )
+            }
+            DropdownMenu(
+                expanded = showDownloadMenu,
+                onDismissRequest = { showDownloadMenu = !showDownloadMenu }) {
+                DropdownMenuItem(onClick = {
+                    onDownloadButtonClicked(DownloadFormat.CSV)
+                    showDownloadMenu = !showDownloadMenu
+                }) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_download_csv))
+                }
+                DropdownMenuItem(onClick = {
+                    onDownloadButtonClicked(DownloadFormat.DB)
+                    showDownloadMenu = !showDownloadMenu
+                }
+                ) {
+                    Text(text = stringResource(id = R.string.expenses_list_menu_item_download_db))
+                }
             }
             IconButton(
-                onClick = { showMenu = !showMenu }) {
+                onClick = { showSortMenu = !showSortMenu }) {
                 Icon(
                     tint = colorResource(id = R.color.white),
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(id = R.string.expenses_list_display_menu_content_description)
+                    imageVector = Icons.Filled.Sort,
+                    contentDescription = stringResource(id = R.string.expenses_list_display_sort_menu_content_description)
                 )
             }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = !showMenu }) {
+            DropdownMenu(
+                expanded = showSortMenu,
+                onDismissRequest = { showSortMenu = !showSortMenu }) {
                 DropdownMenuItem(onClick = {
                     onSortModeUpdated(SortMode.ExpenseDateDescending)
-                    showMenu = !showMenu
+                    showSortMenu = !showSortMenu
                 }) {
                     Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_descending))
                 }
                 DropdownMenuItem(onClick = {
                     onSortModeUpdated(SortMode.ExpenseDateAscending)
-                    showMenu = !showMenu
+                    showSortMenu = !showSortMenu
                 }
                 ) {
                     Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
@@ -333,6 +357,16 @@ fun ExpensesListScreenPreview() {
             onSortModeUpdated = {},
             onDownloadButtonClicked = {},
             navigateToExpensesDetailScreen = {})
+    }
+}
+
+@Preview("ExpenseCard light mode", showBackground = true)
+@Preview("ExpensesCard dark mode", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun ExpensesListTopAppBarPreview() {
+    ExpensesAppTheme {
+        ExpensesListTopAppBar(onSortModeUpdated = {},
+            onDownloadButtonClicked = {})
     }
 }
 

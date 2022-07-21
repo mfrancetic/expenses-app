@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.db.ExpensesAppDatabase
+import com.mfrancetic.expensesapp.models.DownloadFormat
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
 import com.mfrancetic.expensesapp.models.SortMode
@@ -55,8 +56,8 @@ class ExpensesListViewModel @Inject constructor(
         }
     }
 
-    fun downloadData() = intent {
-        val isDatabaseExported = exportManager.exportDatabase(expensesAppDatabase)
+    fun downloadData(downloadFormat: DownloadFormat) = intent {
+        val isDatabaseExported = exportManager.exportDatabase(expensesAppDatabase, downloadFormat)
 
         postSideEffect(
             if (isDatabaseExported) ExpensesListSideEffect.DisplayExpensesDataDownloadSuccess

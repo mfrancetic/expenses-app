@@ -83,8 +83,8 @@ class ExpensesActivity : ComponentActivity() {
                     onSortModeUpdated = { sortMode ->
                         expensesListViewModel.updateSortMode(sortMode)
                     },
-                    onDownloadButtonClicked = {
-                        expensesListViewModel.downloadData()
+                    onDownloadButtonClicked = { downloadFormat ->
+                        expensesListViewModel.downloadData(downloadFormat)
                     },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)

@@ -2,6 +2,7 @@ package com.mfrancetic.expensesapp.di.modules
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.mfrancetic.expensesapp.ExpenseRepository
 import com.mfrancetic.expensesapp.db.ExpenseDao
 import com.mfrancetic.expensesapp.db.ExpensesAppDatabase
@@ -22,8 +23,8 @@ class RepositoryModule {
         return Room.databaseBuilder(
             appContext,
             ExpensesAppDatabase::class.java,
-            "Expenses"
-        ).build()
+            "expenses_database"
+        ).setJournalMode(RoomDatabase.JournalMode.TRUNCATE).build()
     }
 
     @Provides
