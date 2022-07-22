@@ -1,6 +1,7 @@
 package com.mfrancetic.expensesapp.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -47,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -64,6 +67,7 @@ import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.SortMode
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.ui.theme.LightOrange
 import com.mfrancetic.expensesapp.utils.FormatUtils.formatCurrency
 import java.text.SimpleDateFormat
 import java.util.*
@@ -82,6 +86,7 @@ fun ExpensesListScreen(
 ) {
     val context = LocalContext.current
     val expenses = viewModel.container.stateFlow.collectAsState().value.expenses
+    val areExpensesEmpty = expenses.isEmpty()
     val expenseDeletedSuccessMessage =
         stringResource(id = R.string.expenses_list_expense_deleted_success)
     val expenseDeletedFailureMessage =
@@ -119,7 +124,7 @@ fun ExpensesListScreen(
     }
 
     Scaffold(topBar = {
-        ExpensesListTopAppBar(onSortModeUpdated = { sortMode ->
+        ExpensesListTopAppBar(areExpensesEmpty = areExpensesEmpty, onSortModeUpdated = { sortMode ->
             onSortModeUpdated.invoke(sortMode)
         },
             onDownloadButtonClicked = { downloadFormat ->
@@ -138,13 +143,22 @@ fun ExpensesListScreen(
     }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         if (expenses.isEmpty()) {
-            Box(
-                Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     style = MaterialTheme.typography.h6,
                     text = stringResource(id = R.string.expenses_list_no_expenses_added)
+                )
+                Button(
+                    onClick = {
+                        navigateToExpensesDetailScreen()
+                    },
+                    content = {
+                        Text(stringResource(id = R.string.expenses_list_add_expense_button_content_description))
+                    }
                 )
             }
         } else {
@@ -164,6 +178,7 @@ fun ExpensesListScreen(
 
 @Composable
 fun ExpensesListTopAppBar(
+    areExpensesEmpty: Boolean = false,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
     onDeleteAllExpensesButtonClicked: () -> Unit
@@ -187,11 +202,13 @@ fun ExpensesListTopAppBar(
             )
         },
         actions = {
-            IconButton(onClick = {
-                showDownloadMenu = !showDownloadMenu
-            }) {
+            IconButton(
+                enabled = !areExpensesEmpty,
+                onClick = {
+                    showDownloadMenu = !showDownloadMenu
+                }) {
                 Icon(
-                    tint = colorResource(id = R.color.white),
+                    tint = if (areExpensesEmpty) LightOrange else Color.White,
                     imageVector = Icons.Filled.Download,
                     contentDescription = stringResource(id = R.string.expenses_list_display_download_menu_content_description)
                 )
@@ -238,11 +255,13 @@ fun ExpensesListTopAppBar(
                     Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
                 }
             }
-            IconButton(onClick = {
-                showDeleteAllExpensesAlertDialog = !showDeleteAllExpensesAlertDialog
-            }) {
+            IconButton(
+                enabled = !areExpensesEmpty,
+                onClick = {
+                    showDeleteAllExpensesAlertDialog = !showDeleteAllExpensesAlertDialog
+                }) {
                 Icon(
-                    tint = colorResource(id = R.color.white),
+                    tint = if (areExpensesEmpty) LightOrange else Color.White,
                     imageVector = Icons.Filled.Delete,
                     contentDescription = stringResource(id = R.string.expenses_list_menu_item_delete_all_expenses)
                 )
