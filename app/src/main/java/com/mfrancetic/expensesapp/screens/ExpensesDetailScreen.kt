@@ -241,6 +241,7 @@ fun ExpensesDetailCategoryTextField(
     Column {
         TextField(
             readOnly = true,
+            enabled = false,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
@@ -282,6 +283,7 @@ fun ExpensesDetailDateTextField(
 
     TextField(
         readOnly = true,
+        enabled = false,
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth(),

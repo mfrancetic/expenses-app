@@ -5,6 +5,7 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -374,6 +375,9 @@ fun ExpenseCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable {
+                onEditExpenseButtonClicked(expense)
+            }
     ) {
         Row(modifier = Modifier.padding(4.dp)) {
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -410,13 +414,6 @@ fun ExpenseCard(
             Column(
                 horizontalAlignment = Alignment.End,
             ) {
-                IconButton(
-                    onClick = { onEditExpenseButtonClicked(expense) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = stringResource(id = R.string.expense_list_edit_expense_button_content_description)
-                    )
-                }
                 IconButton(
                     onClick = { onDeleteExpenseButtonClicked(expense) }) {
                     Icon(
