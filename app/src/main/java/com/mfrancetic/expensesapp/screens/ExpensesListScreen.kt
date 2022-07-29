@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
@@ -385,6 +386,7 @@ fun ExpenseCard(
                     ExpenseCategory.Rent -> Icons.Filled.House
                     ExpenseCategory.Utilities -> Icons.Filled.Lightbulb
                     ExpenseCategory.Groceries -> Icons.Filled.ShoppingCart
+                    ExpenseCategory.Restaurants -> Icons.Filled.Restaurant
                     ExpenseCategory.Entertainment -> Icons.Filled.MusicNote
                     ExpenseCategory.Fuel -> Icons.Filled.ElectricCar
                     ExpenseCategory.Other -> Icons.Filled.Payments

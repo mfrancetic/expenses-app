@@ -12,11 +12,14 @@ import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -48,6 +51,7 @@ import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -102,7 +106,9 @@ fun ExpensesDetailScreen(
                         val decimalPlacesComma = newAmount.substringAfter(",", "").length
                         val decimalPlacesDot = newAmount.substringAfter(".", "").length
                         val newAmountDouble = newAmount.toDoubleOrNull()
-                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2) && newAmountDouble != null) {
+                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2) && newAmountDouble != null &&
+                            newAmountDouble < MAX_AMOUNT
+                        ) {
                             onExpenseUpdated(expense.copy(amount = newAmountDouble))
                         }
                     },
@@ -245,6 +251,11 @@ fun ExpensesDetailCategoryTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                disabledTextColor = LocalContentColor.current.copy(
+                    LocalContentAlpha.current
+                )
+            ),
             value = category.name, onValueChange = {
                 onCategoryUpdated(ExpenseCategory.valueOf(it))
             },
@@ -287,6 +298,11 @@ fun ExpensesDetailDateTextField(
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth(),
+        colors = TextFieldDefaults.textFieldColors(
+            disabledTextColor = LocalContentColor.current.copy(
+                LocalContentAlpha.current
+            )
+        ),
         value = SimpleDateFormat.getDateInstance().format(date), onValueChange = {
         },
         label = {

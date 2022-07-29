@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesDetailState
+import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -42,7 +43,7 @@ class ExpensesDetailViewModel @Inject constructor(
     }
 
     private fun isExpenseValid(expense: Expense): Boolean {
-        return expense.amount > 0 &&
+        return expense.amount > 0 && expense.amount < MAX_AMOUNT &&
                 expense.title.isNotBlank() && expense.date != 0L
     }
 }
