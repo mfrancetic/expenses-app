@@ -2,6 +2,7 @@ package com.mfrancetic.expensesapp.screens
 
 import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,9 +48,11 @@ import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesDetailViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.db.Expense
+import com.mfrancetic.expensesapp.models.AmountError
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
+import com.mfrancetic.expensesapp.models.TitleError
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import java.text.SimpleDateFormat
@@ -69,6 +72,8 @@ fun ExpensesDetailScreen(
         viewModel.container.stateFlow.collectAsState().value
     val expense = expensesDetailState.expense
     val isSaveButtonEnabled = expensesDetailState.isSaveExpenseEnabled
+    val titleError = expensesDetailState.titleError
+    val amountError = expensesDetailState.amountError
 
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
@@ -95,6 +100,7 @@ fun ExpensesDetailScreen(
             ) {
                 ExpensesDetailTitleTextField(
                     title = expense.title,
+                    titleError = titleError,
                     onTitleUpdated = { newTitle ->
                         onExpenseUpdated(expense.copy(title = newTitle))
                     })
@@ -102,6 +108,7 @@ fun ExpensesDetailScreen(
                 ExpensesDetailAmountTextField(
                     amount = "${expense.amount}",
                     currency = expense.currency,
+                    amountError = amountError,
                     onAmountUpdated = { newAmount ->
                         val decimalPlacesComma = newAmount.substringAfter(",", "").length
                         val decimalPlacesDot = newAmount.substringAfter(".", "").length
@@ -171,6 +178,7 @@ fun ExpensesDetailScreenTopAppBar(isEditMode: Boolean = false, onUpButtonClicked
 @Composable
 fun ExpensesDetailTitleTextField(
     title: String,
+    titleError: TitleError?,
     onTitleUpdated: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -182,6 +190,7 @@ fun ExpensesDetailTitleTextField(
         value = title, onValueChange = {
             onTitleUpdated(it)
         },
+        isError = titleError != null,
         label = {
             Text(text = stringResource(id = R.string.expenses_details_title))
         },
@@ -196,12 +205,21 @@ fun ExpensesDetailTitleTextField(
             focusManager.moveFocus(FocusDirection.Down)
         })
     )
+    if (titleError == TitleError.TitleEmpty) {
+        Text(
+            text = stringResource(id = R.string.expenses_details_title_error_title_empty),
+            color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
 }
 
 @Composable
 fun ExpensesDetailAmountTextField(
     amount: String,
     currency: ExpenseCurrency,
+    amountError: AmountError?,
     onAmountUpdated: (String) -> Unit,
     onSaveButtonClicked: () -> Unit
 ) {
@@ -213,6 +231,7 @@ fun ExpensesDetailAmountTextField(
         value = amount, onValueChange = {
             onAmountUpdated(it)
         },
+        isError = amountError != null,
         label = {
             Text(text = stringResource(id = R.string.expenses_details_amount))
         },
@@ -230,6 +249,14 @@ fun ExpensesDetailAmountTextField(
             onSaveButtonClicked()
         })
     )
+    if (amountError == AmountError.AmountTooLow) {
+        Text(
+            text = stringResource(id = R.string.expenses_detail_amount_error_amount_too_low),
+            color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
 }
 
 @Composable
