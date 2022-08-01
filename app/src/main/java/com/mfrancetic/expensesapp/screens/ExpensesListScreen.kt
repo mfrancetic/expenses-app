@@ -164,16 +164,23 @@ fun ExpensesListScreen(
                 )
             }
         } else {
-            ExpenseList(
-                modifier = Modifier.padding(innerPadding),
-                expenses = expenses,
-                onEditExpenseButtonClicked = { expense ->
-                    onEditExpenseButtonClicked.invoke(expense)
-                },
-                onDeleteExpenseButtonClicked = { expense ->
-                    onDeleteExpenseButtonClicked.invoke(expense)
-                }
-            )
+            Column {
+                ExpenseHeader(
+                    title = stringResource(id = R.string.expenses_list_total_expense_amount),
+                    amount = expenses.sumOf { it.amount },
+                    currency = ExpenseCurrency.HRK
+                )
+                ExpenseList(
+                    modifier = Modifier.padding(innerPadding),
+                    expenses = expenses,
+                    onEditExpenseButtonClicked = { expense ->
+                        onEditExpenseButtonClicked.invoke(expense)
+                    },
+                    onDeleteExpenseButtonClicked = { expense ->
+                        onDeleteExpenseButtonClicked.invoke(expense)
+                    }
+                )
+            }
         }
     }
 }

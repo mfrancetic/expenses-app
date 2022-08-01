@@ -19,6 +19,7 @@
     <string name="expenses_list_all_expenses_deleted_failure">Failed to delete all expenses</string>
     <string name="expenses_list_expenses_data_download_success">Expenses data downloaded</string>
     <string name="expenses_list_expenses_data_download_failure">Failed to download expenses data</string>
+    <string name="expenses_list_total_expense_amount">TOTAL</string>
     <string name="expenses_list_expense_amount">@string/expenses_details_amount</string>
     <string name="expenses_list_expense_date">@string/expenses_details_date</string>
     <string name="expenses_list_delete_all_expenses_dialog_title">Delete all expenses</string>
