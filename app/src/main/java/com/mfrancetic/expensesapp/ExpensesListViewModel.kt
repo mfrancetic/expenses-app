@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.db.ExpensesAppDatabase
+import com.mfrancetic.expensesapp.models.DateRange
 import com.mfrancetic.expensesapp.models.DownloadFormat
 import com.mfrancetic.expensesapp.models.ExpensesListSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesListState
@@ -56,6 +57,10 @@ class ExpensesListViewModel @Inject constructor(
         }
     }
 
+    fun updateDateRange(newDateRange: DateRange) {
+        fetchExpenses(newDateRange)
+    }
+
     fun downloadData(downloadFormat: DownloadFormat) = intent {
         val isDatabaseExported = exportManager.exportDatabase(expensesAppDatabase, downloadFormat)
 
@@ -78,9 +83,9 @@ class ExpensesListViewModel @Inject constructor(
 
     // region Private Helper Methods
 
-    private fun fetchExpenses() = intent {
+    private fun fetchExpenses(dateRange: DateRange? = null) = intent {
         viewModelScope.launch {
-            expenseRepository.fetchAllExpenses().collect { expenses ->
+            expenseRepository.fetchAllExpenses(dateRange).collect { expenses ->
                 reduce {
                     state.copy(expenses = expenses.sorted())
                 }

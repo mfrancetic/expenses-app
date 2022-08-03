@@ -8,6 +8,7 @@
     <string name="expenses_list_menu_item_download_db">Download .db</string>
     <string name="expenses_list_display_download_menu_content_description">Display download menu</string>
     <string name="expenses_list_display_sort_menu_content_description">Display sorting menu</string>
+    <string name="expenses_list_display_filter_menu_content_description">Display filter date range dialog</string>
     <string name="expenses_list_menu_item_sort_by_expense_date_descending">Sort by expense date descending</string>
     <string name="expenses_list_menu_item_sort_by_expense_date_ascending">Sort by expense date ascending</string>
     <string name="expenses_list_menu_item_delete_all_expenses">Delete all expenses</string>

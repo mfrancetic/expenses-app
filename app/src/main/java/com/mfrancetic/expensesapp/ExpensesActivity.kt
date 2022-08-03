@@ -3,6 +3,7 @@ package com.mfrancetic.expensesapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -25,7 +26,7 @@ import com.mfrancetic.expensesapp.utils.NavigationUtils.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ExpensesActivity : ComponentActivity() {
+class ExpensesActivity : AppCompatActivity() {
 
     // region Life-cycle
 
@@ -88,6 +89,9 @@ class ExpensesActivity : ComponentActivity() {
                     },
                     onDeleteAllExpensesButtonClicked = {
                         expensesListViewModel.deleteAllExpenses()
+                    },
+                    onDateRangeUpdated = { dateRange ->
+                        expensesListViewModel.updateDateRange(dateRange)
                     },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)

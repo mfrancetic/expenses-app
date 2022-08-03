@@ -1,13 +1,15 @@
 package com.mfrancetic.expensesapp.screens
 
+import android.app.AppComponentFactory
+import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,8 +35,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ElectricCar
+import androidx.compose.material.icons.filled.Filter
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MusicNote
@@ -60,9 +63,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.db.Expense
+import com.mfrancetic.expensesapp.models.DateRange
 import com.mfrancetic.expensesapp.models.DownloadFormat
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
@@ -74,6 +80,7 @@ import com.mfrancetic.expensesapp.utils.FormatUtils.formatCurrency
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 // region UI
 
 @Composable
@@ -84,6 +91,7 @@ fun ExpensesListScreen(
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
     onDeleteAllExpensesButtonClicked: () -> Unit,
+    onDateRangeUpdated: (DateRange) -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
@@ -126,14 +134,18 @@ fun ExpensesListScreen(
     }
 
     Scaffold(topBar = {
-        ExpensesListTopAppBar(areExpensesEmpty = areExpensesEmpty, onSortModeUpdated = { sortMode ->
-            onSortModeUpdated.invoke(sortMode)
-        },
+        ExpensesListTopAppBar(
+            areExpensesEmpty = areExpensesEmpty, onSortModeUpdated = { sortMode ->
+                onSortModeUpdated.invoke(sortMode)
+            },
             onDownloadButtonClicked = { downloadFormat ->
                 onDownloadButtonClicked.invoke(downloadFormat)
             },
             onDeleteAllExpensesButtonClicked = {
                 onDeleteAllExpensesButtonClicked.invoke()
+            },
+            onDateRangeUpdated = { dateRange ->
+                onDateRangeUpdated.invoke(dateRange)
             })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
@@ -190,8 +202,11 @@ fun ExpensesListTopAppBar(
     areExpensesEmpty: Boolean = false,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
-    onDeleteAllExpensesButtonClicked: () -> Unit
+    onDeleteAllExpensesButtonClicked: () -> Unit,
+    onDateRangeUpdated: (DateRange) -> Unit
 ) {
+    val context = LocalContext.current
+    val fragmentManager = (context as? AppCompatActivity)?.supportFragmentManager
     var showSortMenu by rememberSaveable {
         mutableStateOf(false)
     }
@@ -220,6 +235,24 @@ fun ExpensesListTopAppBar(
                     tint = if (areExpensesEmpty) LightOrange else Color.White,
                     imageVector = Icons.Filled.Download,
                     contentDescription = stringResource(id = R.string.expenses_list_display_download_menu_content_description)
+                )
+            }
+            IconButton(
+                onClick = {
+                    fragmentManager?.let {
+                        MaterialDatePicker.Builder.dateRangePicker().build()
+                            .apply {
+                                addOnPositiveButtonClickListener {
+                                    onDateRangeUpdated(DateRange(Date(it.first), Date(it.second)))
+                                }
+                            }
+                            .show(fragmentManager, this.javaClass.name)
+                    }
+                }) {
+                Icon(
+                    tint = colorResource(id = R.color.white),
+                    imageVector = Icons.Filled.EditCalendar,
+                    contentDescription = stringResource(id = R.string.expenses_list_display_filter_menu_content_description)
                 )
             }
             DropdownMenu(
@@ -320,7 +353,8 @@ fun ExpenseList(
                 simpleDateFormat.format(previousExpense.date)
             }
 
-            val monthlyExpenses = expenses.filter { simpleDateFormat.format(it.date) == month }
+            val monthlyExpenses =
+                expenses.filter { simpleDateFormat.format(it.date) == month }
             val monthlyExpensesSum = monthlyExpenses.sumOf { it.amount }
 
             simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
@@ -450,6 +484,7 @@ fun ExpensesListScreenPreview() {
             onSortModeUpdated = {},
             onDownloadButtonClicked = {},
             onDeleteAllExpensesButtonClicked = {},
+            onDateRangeUpdated = {},
             navigateToExpensesDetailScreen = {})
     }
 }
@@ -461,7 +496,8 @@ fun ExpensesListTopAppBarPreview() {
     ExpensesAppTheme {
         ExpensesListTopAppBar(onSortModeUpdated = {},
             onDownloadButtonClicked = {},
-            onDeleteAllExpensesButtonClicked = {})
+            onDeleteAllExpensesButtonClicked = {},
+            onDateRangeUpdated = {})
     }
 }
 
