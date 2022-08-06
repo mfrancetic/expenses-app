@@ -272,8 +272,8 @@ fun ExpensesListTopAppBar(
                         MaterialDatePicker.Builder.dateRangePicker().build()
                             .apply {
                                 addOnPositiveButtonClickListener {
-                                    onDateRangeUpdated(DateRange(Date(it.first), Date(it.second)))
                                     showFilterMenu = false
+                                    onDateRangeUpdated(DateRange(Date(it.first), Date(it.second)))
                                 }
                             }
                             .show(fragmentManager, this.javaClass.name)
@@ -283,8 +283,8 @@ fun ExpensesListTopAppBar(
                 }
                 DropdownMenuItem(
                     onClick = {
-                        onRemoveDateRange()
                         showFilterMenu = false
+                        onRemoveDateRange()
                     },
                     enabled = isDateRangeFilterEnabled
                 ) {
