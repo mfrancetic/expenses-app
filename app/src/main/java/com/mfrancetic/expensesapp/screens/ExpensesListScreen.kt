@@ -31,10 +31,13 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ElectricCar
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
@@ -89,11 +92,14 @@ fun ExpensesListScreen(
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
     onDeleteAllExpensesButtonClicked: () -> Unit,
     onDateRangeUpdated: (DateRange) -> Unit,
+    onRemoveDateRange: () -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
 ) {
     val context = LocalContext.current
     val expenses = viewModel.container.stateFlow.collectAsState().value.expenses
     val areExpensesEmpty = expenses.isEmpty()
+    val isFilterDateRangeEnabled =
+        viewModel.container.stateFlow.collectAsState().value.isFilterEnabled
     val expenseDeletedSuccessMessage =
         stringResource(id = R.string.expenses_list_expense_deleted_success)
     val expenseDeletedFailureMessage =
@@ -135,6 +141,7 @@ fun ExpensesListScreen(
             areExpensesEmpty = areExpensesEmpty, onSortModeUpdated = { sortMode ->
                 onSortModeUpdated.invoke(sortMode)
             },
+            isDateRangeFilterEnabled = isFilterDateRangeEnabled,
             onDownloadButtonClicked = { downloadFormat ->
                 onDownloadButtonClicked.invoke(downloadFormat)
             },
@@ -143,6 +150,9 @@ fun ExpensesListScreen(
             },
             onDateRangeUpdated = { dateRange ->
                 onDateRangeUpdated.invoke(dateRange)
+            },
+            onRemoveDateRange = {
+                onRemoveDateRange.invoke()
             })
     }, floatingActionButton = {
         FloatingActionButton(onClick = { navigateToExpensesDetailScreen.invoke() }) {
@@ -161,16 +171,21 @@ fun ExpensesListScreen(
             ) {
                 Text(
                     style = MaterialTheme.typography.h6,
-                    text = stringResource(id = R.string.expenses_list_no_expenses_added)
+                    text = stringResource(
+                        id = if (isFilterDateRangeEnabled) R.string.expenses_list_no_expenses_in_date_range else
+                            R.string.expenses_list_no_expenses_added
+                    )
                 )
-                Button(
-                    onClick = {
-                        navigateToExpensesDetailScreen()
-                    },
-                    content = {
-                        Text(stringResource(id = R.string.expenses_list_add_expense_button_content_description))
-                    }
-                )
+                if (!isFilterDateRangeEnabled) {
+                    Button(
+                        onClick = {
+                            navigateToExpensesDetailScreen()
+                        },
+                        content = {
+                            Text(stringResource(id = R.string.expenses_list_add_expense_button_content_description))
+                        }
+                    )
+                }
             }
         } else {
             Column {
@@ -198,10 +213,12 @@ fun ExpensesListScreen(
 @Composable
 fun ExpensesListTopAppBar(
     areExpensesEmpty: Boolean = false,
+    isDateRangeFilterEnabled: Boolean,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
     onDeleteAllExpensesButtonClicked: () -> Unit,
-    onDateRangeUpdated: (DateRange) -> Unit
+    onDateRangeUpdated: (DateRange) -> Unit,
+    onRemoveDateRange: () -> Unit
 ) {
     val context = LocalContext.current
     val fragmentManager = (context as? AppCompatActivity)?.supportFragmentManager
@@ -209,6 +226,9 @@ fun ExpensesListTopAppBar(
         mutableStateOf(false)
     }
     var showDownloadMenu by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showFilterMenu by rememberSaveable {
         mutableStateOf(false)
     }
     var showDeleteAllExpensesAlertDialog by rememberSaveable {
@@ -237,21 +257,39 @@ fun ExpensesListTopAppBar(
             }
             IconButton(
                 onClick = {
+                    showFilterMenu = true
+                }) {
+                Icon(
+                    tint = colorResource(id = R.color.white),
+                    imageVector = if (isDateRangeFilterEnabled) Icons.Filled.EditCalendar else
+                        Icons.Filled.CalendarToday,
+                    contentDescription = stringResource(id = R.string.expenses_list_display_filter_menu_content_description)
+                )
+            }
+            DropdownMenu(expanded = showFilterMenu, onDismissRequest = { showFilterMenu = false }) {
+                DropdownMenuItem(onClick = {
                     fragmentManager?.let {
                         MaterialDatePicker.Builder.dateRangePicker().build()
                             .apply {
                                 addOnPositiveButtonClickListener {
                                     onDateRangeUpdated(DateRange(Date(it.first), Date(it.second)))
+                                    showFilterMenu = false
                                 }
                             }
                             .show(fragmentManager, this.javaClass.name)
                     }
                 }) {
-                Icon(
-                    tint = colorResource(id = R.color.white),
-                    imageVector = Icons.Filled.EditCalendar,
-                    contentDescription = stringResource(id = R.string.expenses_list_display_filter_menu_content_description)
-                )
+                    Text(stringResource(id = R.string.expenses_list_menu_item_filter_date_range))
+                }
+                DropdownMenuItem(
+                    onClick = {
+                        onRemoveDateRange()
+                        showFilterMenu = false
+                    },
+                    enabled = isDateRangeFilterEnabled
+                ) {
+                    Text(stringResource(id = R.string.expenses_list_menu_item_remove_date_range_filter))
+                }
             }
             DropdownMenu(
                 expanded = showDownloadMenu,
@@ -494,6 +532,7 @@ fun ExpensesListScreenPreview() {
             onDownloadButtonClicked = {},
             onDeleteAllExpensesButtonClicked = {},
             onDateRangeUpdated = {},
+            onRemoveDateRange = {},
             navigateToExpensesDetailScreen = {})
     }
 }
@@ -503,10 +542,12 @@ fun ExpensesListScreenPreview() {
 @Composable
 fun ExpensesListTopAppBarPreview() {
     ExpensesAppTheme {
-        ExpensesListTopAppBar(onSortModeUpdated = {},
+        ExpensesListTopAppBar(isDateRangeFilterEnabled = true,
+            onSortModeUpdated = {},
             onDownloadButtonClicked = {},
             onDeleteAllExpensesButtonClicked = {},
-            onDateRangeUpdated = {})
+            onDateRangeUpdated = {},
+            onRemoveDateRange = {})
     }
 }
 

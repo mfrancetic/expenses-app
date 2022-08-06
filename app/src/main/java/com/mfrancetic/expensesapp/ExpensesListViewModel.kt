@@ -61,6 +61,10 @@ class ExpensesListViewModel @Inject constructor(
         fetchExpenses(newDateRange)
     }
 
+    fun removeDateRange(){
+        fetchExpenses()
+    }
+
     fun downloadData(downloadFormat: DownloadFormat) = intent {
         val isDatabaseExported = exportManager.exportDatabase(expensesAppDatabase, downloadFormat)
 
@@ -87,7 +91,7 @@ class ExpensesListViewModel @Inject constructor(
         viewModelScope.launch {
             expenseRepository.fetchAllExpenses(dateRange).collect { expenses ->
                 reduce {
-                    state.copy(expenses = expenses.sorted())
+                    state.copy(expenses = expenses.sorted(), isFilterEnabled = dateRange != null)
                 }
             }
         }

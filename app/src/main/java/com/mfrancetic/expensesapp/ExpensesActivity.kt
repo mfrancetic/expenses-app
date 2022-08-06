@@ -1,7 +1,6 @@
 package com.mfrancetic.expensesapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -92,6 +91,9 @@ class ExpensesActivity : AppCompatActivity() {
                     },
                     onDateRangeUpdated = { dateRange ->
                         expensesListViewModel.updateDateRange(dateRange)
+                    },
+                    onRemoveDateRange = {
+                        expensesListViewModel.removeDateRange()
                     },
                     navigateToExpensesDetailScreen = {
                         navController.navigate(NavigationDestination.ExpensesDetailScreen.name)
