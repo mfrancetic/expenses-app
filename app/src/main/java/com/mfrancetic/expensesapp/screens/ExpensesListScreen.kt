@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -176,7 +177,8 @@ fun ExpensesListScreen(
                 ExpenseHeader(
                     title = stringResource(id = R.string.expenses_list_total_expense_amount),
                     amount = expenses.sumOf { it.amount },
-                    currency = ExpenseCurrency.HRK
+                    currency = ExpenseCurrency.HRK,
+                    isTotalAmount = true
                 )
                 ExpenseList(
                     modifier = Modifier.padding(innerPadding),
@@ -361,7 +363,8 @@ fun ExpenseList(
                     ExpenseHeader(
                         title = "${month.uppercase()} $year",
                         amount = monthlyExpensesSum,
-                        currency = expense.currency
+                        currency = expense.currency,
+                        isTotalAmount = false
                     )
                 }
                 ExpenseCard(
@@ -378,24 +381,33 @@ fun ExpenseList(
 }
 
 @Composable
-fun ExpenseHeader(title: String, amount: Double, currency: ExpenseCurrency) {
+fun ExpenseHeader(
+    title: String, amount: Double, currency: ExpenseCurrency,
+    isTotalAmount: Boolean
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
+            .background(
+                color = if (isTotalAmount) MaterialTheme.colors.primary else
+                    MaterialTheme.colors.background
+            )
             .padding(
                 horizontal = 8.dp,
             )
-            .padding(top = 16.dp, bottom = 4.dp)
+            .padding(top = 8.dp, bottom = 8.dp)
     ) {
+        val textColor = if (isTotalAmount) MaterialTheme.colors.background
+        else MaterialTheme.colors.primary
         Text(
-            color = MaterialTheme.colors.primary,
+            color = textColor,
             style = MaterialTheme.typography.h6,
             text = title
         )
 
         Text(
-            color = MaterialTheme.colors.primary,
+            color = textColor,
             style = MaterialTheme.typography.h6,
             text = "Σ ${amount.formatCurrency(currency)}"
         )
@@ -518,7 +530,21 @@ fun ExpenseHeaderPreview() {
     ExpensesAppTheme {
         ExpenseHeader(
             title = "Groceries", amount = 1524.665,
-            currency = ExpenseCurrency.HRK
+            currency = ExpenseCurrency.HRK,
+            isTotalAmount = false
+        )
+    }
+}
+
+@Preview("ExpenseHeader total light mode", showBackground = true)
+@Preview("ExpenseHeader total dark mode", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun ExpenseHeaderTotalPreview() {
+    ExpensesAppTheme {
+        ExpenseHeader(
+            title = "Groceries", amount = 1524.665,
+            currency = ExpenseCurrency.HRK,
+            isTotalAmount = true
         )
     }
 }
