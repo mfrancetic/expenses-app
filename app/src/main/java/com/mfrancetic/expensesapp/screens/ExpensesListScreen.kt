@@ -1,10 +1,7 @@
 package com.mfrancetic.expensesapp.screens
 
-import android.app.AppComponentFactory
-import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -37,7 +34,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ElectricCar
-import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MusicNote
@@ -63,7 +60,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.mfrancetic.expensesapp.ExpensesListViewModel
 import com.mfrancetic.expensesapp.R
@@ -429,7 +425,8 @@ fun ExpenseCard(
                     ExpenseCategory.Groceries -> Icons.Filled.ShoppingCart
                     ExpenseCategory.Restaurants -> Icons.Filled.Restaurant
                     ExpenseCategory.Entertainment -> Icons.Filled.MusicNote
-                    ExpenseCategory.Fuel -> Icons.Filled.ElectricCar
+                    ExpenseCategory.Travel -> Icons.Filled.Hotel
+                    ExpenseCategory.Car -> Icons.Filled.ElectricCar
                     ExpenseCategory.Other -> Icons.Filled.Payments
                 }
 

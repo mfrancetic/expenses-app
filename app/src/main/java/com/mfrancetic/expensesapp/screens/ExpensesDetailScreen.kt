@@ -2,7 +2,6 @@ package com.mfrancetic.expensesapp.screens
 
 import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import android.icu.text.CaseMap.Title
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -109,6 +109,7 @@ fun ExpensesDetailScreen(
                     amount = "${expense.amount}",
                     currency = expense.currency,
                     amountError = amountError,
+                    isSaveButtonEnabled = isSaveButtonEnabled,
                     onAmountUpdated = { newAmount ->
                         val decimalPlacesComma = newAmount.substringAfter(",", "").length
                         val decimalPlacesDot = newAmount.substringAfter(".", "").length
@@ -220,9 +221,12 @@ fun ExpensesDetailAmountTextField(
     amount: String,
     currency: ExpenseCurrency,
     amountError: AmountError?,
+    isSaveButtonEnabled: Boolean,
     onAmountUpdated: (String) -> Unit,
     onSaveButtonClicked: () -> Unit
 ) {
+    val keyboardController = LocalFocusManager.current
+
     TextField(
         singleLine = true,
         modifier = Modifier
@@ -243,10 +247,14 @@ fun ExpensesDetailAmountTextField(
         },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
         ),
-        keyboardActions = KeyboardActions(onNext = {
-            onSaveButtonClicked()
+        keyboardActions = KeyboardActions(onDone = {
+            if (isSaveButtonEnabled) {
+                onSaveButtonClicked()
+            } else {
+                keyboardController.clearFocus()
+            }
         })
     )
     if (amountError == AmountError.AmountTooLow) {
