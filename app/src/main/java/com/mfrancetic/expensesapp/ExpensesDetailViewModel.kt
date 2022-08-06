@@ -36,6 +36,7 @@ class ExpensesDetailViewModel @Inject constructor(
         reduce {
             state.copy(
                 expense = expense, isSaveExpenseEnabled = isExpenseValid(expense),
+                hasEditingStarted = true,
                 titleError = titleError(expense.title), amountError = amountError(expense.amount)
             )
         }

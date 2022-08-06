@@ -45,6 +45,10 @@
     <string name="expenses_details_title_placeholder">Groceries</string>
     <string name="expenses_details_amount_placeholder">10,00</string>
     <string name="expenses_details_date_placeholder">Date</string>
+    <string name="expenses_details_discard_draft_dialog_title">Discard draft</string>
+    <string name="expenses_details_discard_draft_dialog_text">Are you sure you want to discard the draft?</string>
+    <string name="expenses_details_discard_draft_dialog_dismiss">Keep editing</string>
+    <string name="expenses_details_discard_draft_dialog_confirm">Discard</string>
 
     <!-- ExportManager -->
     <string name="notification_channel_name">Download Notifications</string>

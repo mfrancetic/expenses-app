@@ -2,12 +2,17 @@ package com.mfrancetic.expensesapp.screens
 
 import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -18,6 +23,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
@@ -27,10 +33,13 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -71,8 +80,12 @@ fun ExpensesDetailScreen(
         viewModel.container.stateFlow.collectAsState().value
     val expense = expensesDetailState.expense
     val isSaveButtonEnabled = expensesDetailState.isSaveExpenseEnabled
+    val hasEditingStarted = viewModel.container.stateFlow.collectAsState().value.hasEditingStarted
     val titleError = expensesDetailState.titleError
     val amountError = expensesDetailState.amountError
+    var showDiscardDraftDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(true) {
         viewModel.container.sideEffectFlow.collect { sideEffect ->
@@ -83,12 +96,25 @@ fun ExpensesDetailScreen(
         }
     }
 
+    BackHandler(enabled = true, onBack = {
+        if (hasEditingStarted) {
+            showDiscardDraftDialog = true
+        } else {
+            onUpButtonClicked.invoke()
+        }
+    })
     Scaffold(
         topBar = {
             ExpensesDetailScreenTopAppBar(
                 isEditMode = isEditMode,
                 onUpButtonClicked =
-                { onUpButtonClicked.invoke() }
+                {
+                    if (hasEditingStarted) {
+                        showDiscardDraftDialog = true
+                    } else {
+                        onUpButtonClicked.invoke()
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -145,6 +171,28 @@ fun ExpensesDetailScreen(
                     })
             }
         }
+    }
+
+    if (showDiscardDraftDialog) {
+        AlertDialog(
+            onDismissRequest = { showDiscardDraftDialog = false },
+            title = {
+                Text(stringResource(id = R.string.expenses_details_discard_draft_dialog_title))
+            },
+            text = {
+                Text(stringResource(id = R.string.expenses_details_discard_draft_dialog_text))
+            },
+            confirmButton = {
+                TextButton(onClick = { onUpButtonClicked.invoke() }) {
+                    Text(stringResource(id = R.string.expenses_details_discard_draft_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardDraftDialog = false }) {
+                    Text(stringResource(id = R.string.expenses_details_discard_draft_dialog_dismiss))
+                }
+            }
+        )
     }
 }
 
@@ -385,8 +433,11 @@ fun ExpensesDetailScreenSaveButton(isSaveButtonEnabled: Boolean, onSaveButtonCli
 fun ExpensesDetailScreenPreview() {
     ExpensesAppTheme {
         ExpensesDetailScreen(
-            onExpenseUpdated = {}, onUpButtonClicked = {}, onSaveButtonClicked = {},
-            onNavigateBack = {})
+            onExpenseUpdated = {},
+            onUpButtonClicked = {},
+            onSaveButtonClicked = {},
+            onNavigateBack = {},
+        )
     }
 }
 
