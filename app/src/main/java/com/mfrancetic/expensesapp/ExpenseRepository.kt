@@ -20,9 +20,9 @@ class ExpenseRepository @Inject constructor(private val expenseDao: ExpenseDao) 
         expenseDao.insertExpense(expense)
     }
 
-    fun deleteExpense(id: String): Boolean {
-        expenseDao.deleteExpense(id)
-        return expenseDao.getExpenseById(id).isEmpty()
+    fun deleteExpense(expense: Expense): Boolean {
+        expenseDao.insertExpense(expense.copy(deletionDate = System.currentTimeMillis()))
+        return expenseDao.getExpenseById(expense.id).first().deletionDate != null
     }
 
     suspend fun deleteAllExpenses(): Boolean {

@@ -42,7 +42,7 @@ class ExpensesListViewModel @Inject constructor(
     // region Public Interface
 
     fun deleteExpense(expense: Expense) = intent {
-        val isExpenseDeleted = expenseRepository.deleteExpense(expense.id)
+        val isExpenseDeleted = expenseRepository.deleteExpense(expense)
 
         postSideEffect(
             if (isExpenseDeleted)
@@ -91,7 +91,7 @@ class ExpensesListViewModel @Inject constructor(
         viewModelScope.launch {
             expenseRepository.fetchAllExpenses(dateRange).collect { expenses ->
                 reduce {
-                    state.copy(expenses = expenses.sorted(), isFilterEnabled = dateRange != null)
+                    state.copy(expenses = expenses.filterDeleted().sorted(), isFilterEnabled = dateRange != null)
                 }
             }
         }
@@ -105,7 +105,7 @@ class ExpensesListViewModel @Inject constructor(
 
                     reduce {
                         state.copy(
-                            expenses = state.expenses.sorted()
+                            expenses = state.expenses.filterDeleted().sorted()
                         )
                     }
                 }
@@ -117,6 +117,11 @@ class ExpensesListViewModel @Inject constructor(
         return if (sortMode == SortMode.ExpenseDateDescending)
             this.sortedByDescending { it.date } else this.sortedBy { it.date }
     }
+
+    private fun List<Expense>.filterDeleted(): List<Expense> {
+        return this.filter { it.deletionDate == null }
+    }
+
 
     // endregion
 

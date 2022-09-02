@@ -36,8 +36,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ElectricCar
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.FilterNone
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
@@ -458,6 +456,37 @@ fun ExpenseCard(
     onEditExpenseButtonClicked: (Expense) -> Unit,
     onDeleteExpenseButtonClicked: (Expense) -> Unit
 ) {
+    var showDeleteExpenseAlertDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    if (showDeleteExpenseAlertDialog) {
+        AlertDialog(onDismissRequest = {
+            showDeleteExpenseAlertDialog = false
+        },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDeleteExpenseButtonClicked(expense)
+                    showDeleteExpenseAlertDialog = false
+                }) {
+                    Text(stringResource(id = R.string.expenses_list_delete_expense_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteExpenseAlertDialog = false
+                    }) {
+                    Text(text = stringResource(id = R.string.expenses_list_delete_expense_dialog_dismiss))
+                }
+            },
+            title = {
+                Text(text = stringResource(id = R.string.expenses_list_delete_expense_dialog_title))
+            },
+            text = { Text(text = stringResource(id = R.string.expenses_list_delete_expense_dialog_text)) })
+    }
+
+
     Card(
         border = BorderStroke(1.dp, MaterialTheme.colors.primary),
         modifier = modifier
@@ -505,7 +534,9 @@ fun ExpenseCard(
                 horizontalAlignment = Alignment.End,
             ) {
                 IconButton(
-                    onClick = { onDeleteExpenseButtonClicked(expense) }) {
+                    onClick = {
+                        showDeleteExpenseAlertDialog = true
+                    }) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
                         contentDescription = stringResource(id = R.string.expenses_list_delete_expense_button_content_description)

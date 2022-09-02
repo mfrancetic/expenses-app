@@ -37,5 +37,8 @@ data class Expense(
 
     @ColumnInfo(name = "expenseDate")
     @Nonnull
-    var date: Long = System.currentTimeMillis()
+    var date: Long = System.currentTimeMillis(),
+
+    @ColumnInfo(name = "deletionDate")
+    var deletionDate: Long? = null
 ) : Parcelable
