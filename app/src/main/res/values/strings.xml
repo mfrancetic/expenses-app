@@ -25,10 +25,6 @@
     <string name="expenses_list_total_expense_amount">TOTAL</string>
     <string name="expenses_list_expense_amount">@string/expenses_details_amount</string>
     <string name="expenses_list_expense_date">@string/expenses_details_date</string>
-    <string name="expenses_list_delete_all_expenses_dialog_title">Delete all expenses</string>
-    <string name="expenses_list_delete_all_expenses_dialog_text">Are you sure you want to delete all expenses?</string>
-    <string name="expenses_list_delete_all_expenses_dialog_dismiss">Cancel</string>
-    <string name="expenses_list_delete_all_expenses_dialog_confirm">Delete</string>
     <string name="expenses_list_delete_expense_dialog_title">Delete expense</string>
     <string name="expenses_list_delete_expense_dialog_text">Are you sure you want to delete the expense?</string>
     <string name="expenses_list_delete_expense_dialog_dismiss">Cancel</string>

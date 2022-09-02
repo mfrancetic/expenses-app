@@ -6,7 +6,4 @@ sealed class ExpensesListSideEffect {
 
     object DisplayExpensesDataDownloadSuccess: ExpensesListSideEffect()
     object DisplayExpensesDataDownloadFailure: ExpensesListSideEffect()
-
-    object DisplayAllExpensesDeletedSuccess: ExpensesListSideEffect()
-    object DisplayAllExpensesDeletedFailure: ExpensesListSideEffect()
 }

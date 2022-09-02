@@ -86,9 +86,6 @@ class ExpensesActivity : AppCompatActivity() {
                     onDownloadButtonClicked = { downloadFormat ->
                         expensesListViewModel.downloadData(downloadFormat)
                     },
-                    onDeleteAllExpensesButtonClicked = {
-                        expensesListViewModel.deleteAllExpenses()
-                    },
                     onDateRangeUpdated = { dateRange ->
                         expensesListViewModel.updateDateRange(dateRange)
                     },

@@ -88,7 +88,6 @@ fun ExpensesListScreen(
     onDeleteExpenseButtonClicked: (Expense) -> Unit,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
-    onDeleteAllExpensesButtonClicked: () -> Unit,
     onDateRangeUpdated: (DateRange) -> Unit,
     onRemoveDateRange: () -> Unit,
     navigateToExpensesDetailScreen: () -> Unit
@@ -102,10 +101,6 @@ fun ExpensesListScreen(
         stringResource(id = R.string.expenses_list_expense_deleted_success)
     val expenseDeletedFailureMessage =
         stringResource(id = R.string.expenses_list_expense_deleted_failure)
-    val allExpensesDeletedSuccessMessage =
-        stringResource(id = R.string.expenses_list_all_expenses_deleted_success)
-    val allExpensesDeletedFailureMessage =
-        stringResource(id = R.string.expenses_list_all_expenses_deleted_failure)
     val expensesDataDownloadSuccessMessage =
         stringResource(id = R.string.expenses_list_expenses_data_download_success)
     val expensesDataDownloadFailureMessage =
@@ -124,12 +119,6 @@ fun ExpensesListScreen(
                 is ExpensesListSideEffect.DisplayExpensesDataDownloadFailure ->
                     Toast.makeText(context, expensesDataDownloadFailureMessage, Toast.LENGTH_SHORT)
                         .show()
-                is ExpensesListSideEffect.DisplayAllExpensesDeletedSuccess ->
-                    Toast.makeText(context, allExpensesDeletedSuccessMessage, Toast.LENGTH_SHORT)
-                        .show()
-                is ExpensesListSideEffect.DisplayAllExpensesDeletedFailure ->
-                    Toast.makeText(context, allExpensesDeletedFailureMessage, Toast.LENGTH_SHORT)
-                        .show()
             }
         }
     }
@@ -142,9 +131,6 @@ fun ExpensesListScreen(
             isDateRangeFilterEnabled = isFilterDateRangeEnabled,
             onDownloadButtonClicked = { downloadFormat ->
                 onDownloadButtonClicked.invoke(downloadFormat)
-            },
-            onDeleteAllExpensesButtonClicked = {
-                onDeleteAllExpensesButtonClicked.invoke()
             },
             onDateRangeUpdated = { dateRange ->
                 onDateRangeUpdated.invoke(dateRange)
@@ -214,7 +200,6 @@ fun ExpensesListTopAppBar(
     isDateRangeFilterEnabled: Boolean,
     onSortModeUpdated: (SortMode) -> Unit,
     onDownloadButtonClicked: (DownloadFormat) -> Unit,
-    onDeleteAllExpensesButtonClicked: () -> Unit,
     onDateRangeUpdated: (DateRange) -> Unit,
     onRemoveDateRange: () -> Unit
 ) {
@@ -227,9 +212,6 @@ fun ExpensesListTopAppBar(
         mutableStateOf(false)
     }
     var showFilterMenu by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeleteAllExpensesAlertDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -330,42 +312,6 @@ fun ExpensesListTopAppBar(
                 ) {
                     Text(text = stringResource(id = R.string.expenses_list_menu_item_sort_by_expense_date_ascending))
                 }
-            }
-            IconButton(
-                enabled = !areExpensesEmpty,
-                onClick = {
-                    showDeleteAllExpensesAlertDialog = !showDeleteAllExpensesAlertDialog
-                }) {
-                Icon(
-                    tint = if (areExpensesEmpty) LightOrange else Color.White,
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = stringResource(id = R.string.expenses_list_menu_item_delete_all_expenses)
-                )
-            }
-            if (showDeleteAllExpensesAlertDialog) {
-                AlertDialog(onDismissRequest = {
-                    showDeleteAllExpensesAlertDialog = false
-                },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            onDeleteAllExpensesButtonClicked()
-                            showDeleteAllExpensesAlertDialog = false
-                        }) {
-                            Text(stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_confirm))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                showDeleteAllExpensesAlertDialog = false
-                            }) {
-                            Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_dismiss))
-                        }
-                    },
-                    title = {
-                        Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_title))
-                    },
-                    text = { Text(text = stringResource(id = R.string.expenses_list_delete_all_expenses_dialog_text)) })
             }
         }
     )
@@ -561,7 +507,6 @@ fun ExpensesListScreenPreview() {
             onDeleteExpenseButtonClicked = {},
             onSortModeUpdated = {},
             onDownloadButtonClicked = {},
-            onDeleteAllExpensesButtonClicked = {},
             onDateRangeUpdated = {},
             onRemoveDateRange = {},
             navigateToExpensesDetailScreen = {})
@@ -576,7 +521,6 @@ fun ExpensesListTopAppBarPreview() {
         ExpensesListTopAppBar(isDateRangeFilterEnabled = true,
             onSortModeUpdated = {},
             onDownloadButtonClicked = {},
-            onDeleteAllExpensesButtonClicked = {},
             onDateRangeUpdated = {},
             onRemoveDateRange = {})
     }
