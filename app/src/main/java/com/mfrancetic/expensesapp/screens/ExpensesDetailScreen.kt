@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -145,6 +146,9 @@ fun ExpensesDetailScreen(
                             onExpenseUpdated(expense.copy(amount = newAmountDouble))
                         }
                     },
+                    onCurrencyUpdated = { newCurrency ->
+                        onExpenseUpdated(expense.copy(currency = newCurrency))
+                    },
                     onSaveButtonClicked = { onSaveButtonClicked.invoke(expense) }
                 )
 
@@ -270,48 +274,79 @@ fun ExpensesDetailAmountTextField(
     amountError: AmountError?,
     isSaveButtonEnabled: Boolean,
     onAmountUpdated: (String) -> Unit,
+    onCurrencyUpdated: (ExpenseCurrency) -> Unit,
     onSaveButtonClicked: () -> Unit
 ) {
     val keyboardController = LocalFocusManager.current
 
-    TextField(
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        value = amount, onValueChange = {
-            onAmountUpdated(it)
-        },
-        isError = amountError != null,
-        label = {
-            Text(text = stringResource(id = R.string.expenses_details_amount))
-        },
-        placeholder = {
-            Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
-        },
-        trailingIcon = {
-            Text(text = currency.symbol)
-        },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(onDone = {
-            if (isSaveButtonEnabled) {
-                onSaveButtonClicked()
-            } else {
-                keyboardController.clearFocus()
-            }
-        })
-    )
-    if (amountError == AmountError.AmountTooLow) {
-        Text(
-            text = stringResource(id = R.string.expenses_detail_amount_error_amount_too_low),
-            color = MaterialTheme.colors.error,
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(start = 16.dp)
-        )
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
     }
+
+    val icon =
+        if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+
+    Column {
+        TextField(
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            value = amount, onValueChange = {
+                onAmountUpdated(it)
+            },
+            isError = amountError != null,
+            label = {
+                Text(text = stringResource(id = R.string.expenses_details_amount))
+            },
+            placeholder = {
+                Text(text = stringResource(id = R.string.expenses_details_amount_placeholder))
+            },
+            trailingIcon = {
+                Row {
+                    Text(text = currency.symbol)
+                    Icon(imageVector = icon,
+                        contentDescription = stringResource(id = R.string.expenses_details_currency_content_description),
+                        modifier = Modifier.clickable { expanded = !expanded })
+                }
+
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                if (isSaveButtonEnabled) {
+                    onSaveButtonClicked()
+                } else {
+                    keyboardController.clearFocus()
+                }
+            })
+        )
+
+        if (amountError == AmountError.AmountTooLow) {
+            Text(
+                text = stringResource(id = R.string.expenses_detail_amount_error_amount_too_low),
+                color = MaterialTheme.colors.error,
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+        DropdownMenu(
+            expanded = expanded, onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ExpenseCurrency.values().forEach { currency ->
+                DropdownMenuItem(onClick = {
+                    onCurrencyUpdated(currency)
+                    expanded = false
+                }) {
+                    Text(currency.name)
+                }
+            }
+        }
+    }
+
 }
 
 @Composable

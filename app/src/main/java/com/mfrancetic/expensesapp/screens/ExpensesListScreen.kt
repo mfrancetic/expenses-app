@@ -172,11 +172,13 @@ fun ExpensesListScreen(
                 }
             }
         } else {
+            val totalExpensesAmountMap = expenses.groupBy { expense -> expense.currency }
+                .mapValues { entry -> entry.value.sumOf { it.amount } }
+
             Column {
                 ExpenseHeader(
                     title = stringResource(id = R.string.expenses_list_total_expense_amount),
-                    amount = expenses.sumOf { it.amount },
-                    currency = ExpenseCurrency.HRK,
+                    amountCurrencyMap = totalExpensesAmountMap,
                     isTotalAmount = true
                 )
                 ExpenseList(
@@ -335,7 +337,9 @@ fun ExpenseList(
 
             val monthlyExpenses =
                 expenses.filter { simpleDateFormat.format(it.date) == month }
-            val monthlyExpensesSum = monthlyExpenses.sumOf { it.amount }
+
+            val monthlyExpensesAmountMap = monthlyExpenses.groupBy { monthlyExpense -> monthlyExpense.currency }
+                .mapValues { entry -> entry.value.sumOf { it.amount } }
 
             simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
             val year = simpleDateFormat.format(expense.date)
@@ -344,8 +348,7 @@ fun ExpenseList(
                 if (previousMonth != month) {
                     ExpenseHeader(
                         title = "${month.uppercase()} $year",
-                        amount = monthlyExpensesSum,
-                        currency = expense.currency,
+                        amountCurrencyMap = monthlyExpensesAmountMap,
                         isTotalAmount = false
                     )
                 }
@@ -364,7 +367,7 @@ fun ExpenseList(
 
 @Composable
 fun ExpenseHeader(
-    title: String, amount: Double, currency: ExpenseCurrency,
+    title: String, amountCurrencyMap: Map<ExpenseCurrency, Double>,
     isTotalAmount: Boolean
 ) {
     Row(
@@ -388,11 +391,15 @@ fun ExpenseHeader(
             text = title
         )
 
-        Text(
-            color = textColor,
-            style = MaterialTheme.typography.h6,
-            text = "Σ ${amount.formatCurrency(currency)}"
-        )
+        Column {
+            amountCurrencyMap.forEach { amountCurrencyEntry ->
+                Text(
+                    color = textColor,
+                    style = MaterialTheme.typography.h6,
+                    text = "Σ ${amountCurrencyEntry.value.formatCurrency(amountCurrencyEntry.key)}"
+                )
+            }
+        }
     }
 }
 
@@ -545,8 +552,8 @@ fun ExpenseCardPreview() {
 fun ExpenseHeaderPreview() {
     ExpensesAppTheme {
         ExpenseHeader(
-            title = "Groceries", amount = 1524.665,
-            currency = ExpenseCurrency.HRK,
+            title = "Groceries",
+            amountCurrencyMap = mutableMapOf(),
             isTotalAmount = false
         )
     }
@@ -558,8 +565,8 @@ fun ExpenseHeaderPreview() {
 fun ExpenseHeaderTotalPreview() {
     ExpensesAppTheme {
         ExpenseHeader(
-            title = "Groceries", amount = 1524.665,
-            currency = ExpenseCurrency.HRK,
+            title = "Groceries",
+            amountCurrencyMap = mutableMapOf(),
             isTotalAmount = true
         )
     }
