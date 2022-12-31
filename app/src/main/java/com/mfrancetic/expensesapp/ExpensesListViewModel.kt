@@ -42,6 +42,12 @@ class ExpensesListViewModel @Inject constructor(
     // region Public Interface
 
     fun deleteExpense(expense: Expense) = intent {
+        reduce {
+            state.copy(
+                isLoading = true,
+            )
+        }
+        
         val isExpenseDeleted = expenseRepository.deleteExpense(expense)
 
         postSideEffect(
@@ -80,11 +86,18 @@ class ExpensesListViewModel @Inject constructor(
 
     private fun fetchExpenses(dateRange: DateRange? = null) = intent {
         viewModelScope.launch {
+            reduce {
+                state.copy(
+                    isLoading = true,
+                )
+            }
+
             expenseRepository.fetchAllExpenses(dateRange).collect { expenses ->
                 reduce {
                     state.copy(
                         expenses = expenses.filterDeleted().sorted(),
-                        isFilterEnabled = dateRange != null
+                        isFilterEnabled = dateRange != null,
+                        isLoading = false,
                     )
                 }
             }
@@ -93,13 +106,21 @@ class ExpensesListViewModel @Inject constructor(
 
     private fun fetchSortMode() = intent {
         viewModelScope.launch {
+
+            reduce {
+                state.copy(
+                    isLoading = true,
+                )
+            }
+
             expensesDataStore.fetchSortMode().collect { newSortMode ->
                 if (newSortMode != null && newSortMode != sortMode) {
                     sortMode = newSortMode
 
                     reduce {
                         state.copy(
-                            expenses = state.expenses.filterDeleted().sorted()
+                            expenses = state.expenses.filterDeleted().sorted(),
+                            isLoading = false,
                         )
                     }
                 }

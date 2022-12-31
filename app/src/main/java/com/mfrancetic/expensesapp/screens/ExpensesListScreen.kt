@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FabPosition
@@ -147,52 +148,61 @@ fun ExpensesListScreen(
         }
     }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
-        if (expenses.isEmpty()) {
+        if (viewModel.container.stateFlow.collectAsState().value.isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    style = MaterialTheme.typography.h6,
-                    text = stringResource(
-                        id = if (isFilterDateRangeEnabled) R.string.expenses_list_no_expenses_in_date_range else
-                            R.string.expenses_list_no_expenses_added
+                CircularProgressIndicator()
+            }
+        } else
+            if (expenses.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        style = MaterialTheme.typography.h6,
+                        text = stringResource(
+                            id = if (isFilterDateRangeEnabled) R.string.expenses_list_no_expenses_in_date_range else
+                                R.string.expenses_list_no_expenses_added
+                        )
                     )
-                )
-                if (!isFilterDateRangeEnabled) {
-                    Button(
-                        onClick = {
-                            navigateToExpensesDetailScreen()
+                    if (!isFilterDateRangeEnabled) {
+                        Button(
+                            onClick = {
+                                navigateToExpensesDetailScreen()
+                            },
+                            content = {
+                                Text(stringResource(id = R.string.expenses_list_add_expense_button_content_description))
+                            }
+                        )
+                    }
+                }
+            } else {
+                val totalExpensesAmountMap = expenses.groupBy { expense -> expense.currency }
+                    .mapValues { entry -> entry.value.sumOf { it.amount } }
+
+                Column {
+                    ExpenseHeader(
+                        title = stringResource(id = R.string.expenses_list_total_expense_amount),
+                        amountCurrencyMap = totalExpensesAmountMap,
+                        isTotalAmount = true
+                    )
+                    ExpenseList(
+                        modifier = Modifier.padding(innerPadding),
+                        expenses = expenses,
+                        onEditExpenseButtonClicked = { expense ->
+                            onEditExpenseButtonClicked.invoke(expense)
                         },
-                        content = {
-                            Text(stringResource(id = R.string.expenses_list_add_expense_button_content_description))
+                        onDeleteExpenseButtonClicked = { expense ->
+                            onDeleteExpenseButtonClicked.invoke(expense)
                         }
                     )
                 }
             }
-        } else {
-            val totalExpensesAmountMap = expenses.groupBy { expense -> expense.currency }
-                .mapValues { entry -> entry.value.sumOf { it.amount } }
-
-            Column {
-                ExpenseHeader(
-                    title = stringResource(id = R.string.expenses_list_total_expense_amount),
-                    amountCurrencyMap = totalExpensesAmountMap,
-                    isTotalAmount = true
-                )
-                ExpenseList(
-                    modifier = Modifier.padding(innerPadding),
-                    expenses = expenses,
-                    onEditExpenseButtonClicked = { expense ->
-                        onEditExpenseButtonClicked.invoke(expense)
-                    },
-                    onDeleteExpenseButtonClicked = { expense ->
-                        onDeleteExpenseButtonClicked.invoke(expense)
-                    }
-                )
-            }
-        }
     }
 }
 
@@ -338,8 +348,9 @@ fun ExpenseList(
             val monthlyExpenses =
                 expenses.filter { simpleDateFormat.format(it.date) == month }
 
-            val monthlyExpensesAmountMap = monthlyExpenses.groupBy { monthlyExpense -> monthlyExpense.currency }
-                .mapValues { entry -> entry.value.sumOf { it.amount } }
+            val monthlyExpensesAmountMap =
+                monthlyExpenses.groupBy { monthlyExpense -> monthlyExpense.currency }
+                    .mapValues { entry -> entry.value.sumOf { it.amount } }
 
             simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
             val year = simpleDateFormat.format(expense.date)
