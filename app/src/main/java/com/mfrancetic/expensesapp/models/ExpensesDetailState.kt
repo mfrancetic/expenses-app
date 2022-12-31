@@ -1,9 +1,7 @@
 package com.mfrancetic.expensesapp.models
 
-import com.mfrancetic.expensesapp.db.Expense
-
 data class ExpensesDetailState(
-    val expense: Expense,
+    val expense: ExpenseViewData,
     val isSaveExpenseEnabled: Boolean = false,
     val hasEditingStarted: Boolean = false,
     val titleError: TitleError? = null,

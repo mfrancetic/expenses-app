@@ -16,9 +16,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mfrancetic.expensesapp.db.Expense
+import com.mfrancetic.expensesapp.models.ExpenseViewData
 import com.mfrancetic.expensesapp.screens.ExpensesDetailScreen
 import com.mfrancetic.expensesapp.screens.ExpensesListScreen
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.ExpenseViewDataFactory.toExpenseViewData
 import com.mfrancetic.expensesapp.utils.NavigationConstants.EXPENSE_KEY
 import com.mfrancetic.expensesapp.utils.NavigationDestination
 import com.mfrancetic.expensesapp.utils.NavigationUtils.navigate
@@ -74,7 +76,7 @@ class ExpensesActivity : AppCompatActivity() {
                     onEditExpenseButtonClicked = { expense ->
                         navController.navigate(
                             route = NavigationDestination.ExpensesDetailScreen.name,
-                            args = bundleOf(EXPENSE_KEY to expense)
+                            args = bundleOf(EXPENSE_KEY to expense.toExpenseViewData())
                         )
                     },
                     onDeleteExpenseButtonClicked = { expense ->
@@ -99,7 +101,7 @@ class ExpensesActivity : AppCompatActivity() {
 
             composable(NavigationDestination.ExpensesDetailScreen.name) {
                 val expensesDetailViewModel = hiltViewModel<ExpensesDetailViewModel>()
-                val expense = it.arguments?.getParcelable<Expense>(EXPENSE_KEY)
+                val expense = it.arguments?.getParcelable<ExpenseViewData>(EXPENSE_KEY)
                 expensesDetailViewModel.initWithExpense(expense)
 
                 ExpensesDetailScreen(

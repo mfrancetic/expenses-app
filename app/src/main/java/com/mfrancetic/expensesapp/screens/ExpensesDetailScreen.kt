@@ -2,10 +2,7 @@ package com.mfrancetic.expensesapp.screens
 
 import android.app.DatePickerDialog
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,13 +31,10 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -56,10 +50,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mfrancetic.expensesapp.ExpensesDetailViewModel
 import com.mfrancetic.expensesapp.R
-import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.AmountError
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
+import com.mfrancetic.expensesapp.models.ExpenseViewData
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.TitleError
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
@@ -72,9 +66,9 @@ import java.util.*
 fun ExpensesDetailScreen(
     isEditMode: Boolean = false,
     viewModel: ExpensesDetailViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    onExpenseUpdated: (Expense) -> Unit,
+    onExpenseUpdated: (ExpenseViewData) -> Unit,
     onUpButtonClicked: () -> Unit,
-    onSaveButtonClicked: (Expense) -> Unit,
+    onSaveButtonClicked: (ExpenseViewData) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val expensesDetailState =
@@ -132,19 +126,17 @@ fun ExpensesDetailScreen(
                     })
 
                 ExpensesDetailAmountTextField(
-                    amount = "${expense.amount}",
+                    amount = expense.amountString,
                     currency = expense.currency,
                     amountError = amountError,
                     isSaveButtonEnabled = isSaveButtonEnabled,
                     onAmountUpdated = { newAmount ->
-                        val decimalPlacesComma = newAmount.substringAfter(",", "").length
-                        val decimalPlacesDot = newAmount.substringAfter(".", "").length
-                        val newAmountDouble = newAmount.toDoubleOrNull()
-                        if (decimalPlacesComma <= 2 && decimalPlacesDot <= 2 && (decimalPlacesComma + decimalPlacesDot <= 2) && newAmountDouble != null &&
-                            newAmountDouble < MAX_AMOUNT
-                        ) {
-                            onExpenseUpdated(expense.copy(amount = newAmountDouble))
-                        }
+                        onExpenseUpdated(
+                            expense.copy(
+                                amount = newAmount.toDoubleOrNull(),
+                                amountString = newAmount
+                            )
+                        )
                     },
                     onCurrencyUpdated = { newCurrency ->
                         onExpenseUpdated(expense.copy(currency = newCurrency))
@@ -293,7 +285,10 @@ fun ExpensesDetailAmountTextField(
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
             value = amount, onValueChange = {
-                onAmountUpdated(it)
+                if (it.isBlank() || it.toDoubleOrNull() != null
+                ) {
+                    onAmountUpdated(it)
+                }
             },
             isError = amountError != null,
             label = {
@@ -324,9 +319,12 @@ fun ExpensesDetailAmountTextField(
             })
         )
 
-        if (amountError == AmountError.AmountTooLow) {
+        if (amountError != null) {
             Text(
-                text = stringResource(id = R.string.expenses_detail_amount_error_amount_too_low),
+                text =
+                if (amountError == AmountError.AmountTooLow)
+                    stringResource(id = R.string.expenses_detail_amount_error_amount_too_low)
+                else stringResource(id = R.string.expenses_detail_amount_error_invalid_format),
                 color = MaterialTheme.colors.error,
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(start = 16.dp)

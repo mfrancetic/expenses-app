@@ -29,7 +29,7 @@ data class Expense(
 
     @ColumnInfo(name = "expenseCurrency")
     @Nonnull
-    var currency: ExpenseCurrency = ExpenseCurrency.HRK,
+    var currency: ExpenseCurrency = ExpenseCurrency.EUR,
 
     @ColumnInfo(name = "expenseCategory")
     @Nonnull

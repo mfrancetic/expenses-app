@@ -3,9 +3,12 @@ package com.mfrancetic.expensesapp
 import androidx.lifecycle.ViewModel
 import com.mfrancetic.expensesapp.db.Expense
 import com.mfrancetic.expensesapp.models.AmountError
+import com.mfrancetic.expensesapp.models.ExpenseViewData
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.ExpensesDetailState
 import com.mfrancetic.expensesapp.models.TitleError
+import com.mfrancetic.expensesapp.utils.ExpenseViewDataFactory.toExpense
+import com.mfrancetic.expensesapp.utils.ExpenseViewDataFactory.toExpenseViewData
 import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.orbitmvi.orbit.ContainerHost
@@ -23,16 +26,16 @@ class ExpensesDetailViewModel @Inject constructor(
     ContainerHost<ExpensesDetailState, ExpensesDetailSideEffect> {
 
     override val container = container<ExpensesDetailState, ExpensesDetailSideEffect>(
-        ExpensesDetailState(expense = Expense())
+        ExpensesDetailState(expense = initialExpenseViewData())
     )
 
-    fun initWithExpense(expense: Expense?) = intent {
+    fun initWithExpense(expense: ExpenseViewData?) = intent {
         reduce {
-            state.copy(expense = expense ?: Expense())
+            state.copy(expense = expense ?: initialExpenseViewData())
         }
     }
 
-    fun onExpenseUpdated(expense: Expense) = intent {
+    fun onExpenseUpdated(expense: ExpenseViewData) = intent {
         reduce {
             state.copy(
                 expense = expense, isSaveExpenseEnabled = isExpenseValid(expense),
@@ -42,14 +45,14 @@ class ExpensesDetailViewModel @Inject constructor(
         }
     }
 
-    fun onSaveButtonClicked(expense: Expense) = intent {
-        expenseRepository.addExpense(expense)
+    fun onSaveButtonClicked(expense: ExpenseViewData) = intent {
+        expenseRepository.addExpense(expense.toExpense())
 
         postSideEffect(ExpensesDetailSideEffect.NavigateBack)
     }
 
-    private fun isExpenseValid(expense: Expense): Boolean {
-        return expense.amount > 0 && expense.amount < MAX_AMOUNT &&
+    private fun isExpenseValid(expense: ExpenseViewData): Boolean {
+        return amountError(expense.amount) == null &&
                 expense.title.isNotBlank() && expense.date != 0L
     }
 
@@ -61,11 +64,26 @@ class ExpensesDetailViewModel @Inject constructor(
         }
     }
 
-    private fun amountError(amount: Double): AmountError? {
-        return if (amount > 0) {
-            null
-        } else {
+    private fun amountError(amount: Double?): AmountError? {
+        return if (amount == null) {
+            AmountError.AmountEmpty
+        } else if (amount == 0.0) {
             AmountError.AmountTooLow
+        } else if ((amount.toString().contains(".") &&
+                amount.toString().substringAfter(".").length > 2)
+            || (amount.toString().contains(",") &&
+                    amount.toString().substringAfter(",").length > 2))
+        {
+            AmountError.InvalidFormat
+        } else {
+            null
         }
+    }
+
+    private fun initialExpenseViewData(): ExpenseViewData {
+        return Expense().toExpenseViewData().copy(
+            amount = null,
+            amountString = ""
+        )
     }
 }

@@ -39,7 +39,9 @@
     <string name="expenses_details_title">Title</string>
     <string name="expenses_details_title_error_title_empty">Title cannot be empty</string>
     <string name="expenses_details_amount">Amount</string>
+    <string name="expenses_detail_amount_error_amount_empty">Amount cannot be empty</string>
     <string name="expenses_detail_amount_error_amount_too_low">Amount must be larger than 0</string>
+    <string name="expenses_detail_amount_error_invalid_format">Invalid amount format</string>
     <string name="expenses_details_currency_content_description">Update expense currency</string>
     <string name="expenses_details_category">Category</string>
     <string name="expenses_details_category_content_description">Update expense category</string>
