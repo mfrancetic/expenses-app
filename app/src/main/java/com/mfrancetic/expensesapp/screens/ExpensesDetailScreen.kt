@@ -358,7 +358,8 @@ fun ExpensesDetailCategoryTextField(
     }
     val icon =
         if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
-    val items = ExpenseCategory.values()
+    val context = LocalContext.current
+    val items = ExpenseCategory.values().sortedBy { it.name(context) }
 
     Column {
         TextField(
