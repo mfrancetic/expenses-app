@@ -73,6 +73,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -180,7 +181,8 @@ fun ExpensesListScreen(
                         text = stringResource(
                             id = if (isFilterDateRangeEnabled) R.string.expenses_list_no_expenses_in_date_range else
                                 R.string.expenses_list_no_expenses_added
-                        )
+                        ),
+                        textAlign = TextAlign.Center
                     )
                     if (!isFilterDateRangeEnabled) {
                         Button(
@@ -282,6 +284,7 @@ fun ExpensesListTopAppBar(
                             }
                             .show(fragmentManager, this.javaClass.name)
                     }
+                    showFilterMenu = false
                 }) {
                     Text(stringResource(id = R.string.expenses_list_menu_item_filter_date_range))
                 }
