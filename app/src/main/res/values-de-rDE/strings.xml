@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ExpensesListScreen -->
+    <string name="expenses_list_header">Auflistung der Ausgaben</string>
+    <string name="expenses_list_menu_item_download">Daten herunterladen</string>
+    <string name="expenses_list_menu_item_download_csv">Herunterladen .csv</string>
+    <string name="expenses_list_menu_item_download_db">Herunterladen .db</string>
+    <string name="expenses_list_display_download_menu_content_description">Download-Menü anzeigen</string>
+    <string name="expenses_list_display_sort_menu_content_description">Sortierung-Menü anzeigen</string>
+    <string name="expenses_list_display_filter_menu_content_description">Zeitraumfilterungs-Menü anzeigen</string>
+    <string name="expenses_list_menu_item_sort_by_expense_date_descending">Ausgaben nach Datum absteigend sortieren</string>
+    <string name="expenses_list_menu_item_sort_by_expense_date_ascending">Ausgaben nach Datum aufsteigend sortieren</string>
+    <string name="expenses_list_menu_item_filter_date_range">Zeitraum auswählen</string>
+    <string name="expenses_list_menu_item_remove_date_range_filter">Zeitraumfilter entfernen</string>
+    <string name="expenses_list_menu_item_delete_all_expenses">Alle Ausgaben löschen</string>
+    <string name="expenses_list_add_expense_button_content_description">Ausgabe hinzufügen</string>
+    <string name="expenses_list_delete_expense_button_content_description">Ausgabe löschen</string>
+    <string name="expenses_list_expense_deleted_success">Ausgabe gelöscht</string>
+    <string name="expenses_list_expense_deleted_failure">Fehler beim Löschen der Ausgabe</string>
+    <string name="expenses_list_all_expenses_deleted_success">Alle Ausgaben gelöscht</string>
+    <string name="expenses_list_all_expenses_deleted_failure">Fehler beim Löschen aller Ausgaben</string>
+    <string name="expenses_list_expenses_data_download_success">Ausgaben heruntergeladen</string>
+    <string name="expenses_list_expenses_data_download_failure">Fehler beim Herunterladen der Ausgaben</string>
+    <string name="expenses_list_total_expense_amount">INSGESAMT</string>
+    <string name="expenses_list_delete_expense_dialog_title">Ausgabe löschen</string>
+    <string name="expenses_list_delete_expense_dialog_text">Sind Sie sicher, dass Sie die Ausgabe löschen möchten?</string>
+    <string name="expenses_list_delete_expense_dialog_dismiss">Abbrechen</string>
+    <string name="expenses_list_delete_expense_dialog_confirm">Löschen</string>
+    <string name="expenses_list_no_expenses_added">Keine Ausgaben hinzugefügt</string>
+    <string name="expenses_list_no_expenses_in_date_range">Keine Ausgaben im ausgewählten Zeitraum</string>
+
+    <!-- ExpensesDetailScreen -->
+    <string name="expenses_details_header_new_expense">Neue Ausgabe</string>
+    <string name="expenses_details_header_edit_expense">Ausgabe bearbeiten</string>
+    <string name="expenses_details_up_button_content_description">Zurück zur Auflistung der Ausgaben</string>
+    <string name="expenses_details_title">Bezeichnung</string>
+    <string name="expenses_details_title_error_title_empty">Bezeichnung darf nicht leer sein</string>
+    <string name="expenses_details_amount">Betrag</string>
+    <string name="expenses_detail_amount_error_amount_empty">Betrag darf nicht leer sein</string>
+    <string name="expenses_detail_amount_error_amount_too_low">Betrag muss größer als 0 sein</string>
+    <string name="expenses_detail_amount_error_invalid_format">Betragsformat ungültig</string>
+    <string name="expenses_details_currency_content_description">Ausgabenwährung bearbeiten</string>
+    <string name="expenses_details_category">Kategorie</string>
+    <string name="expenses_details_category_content_description">Ausgabenkategorie bearbeiten</string>
+    <string name="expenses_details_date">Datum</string>
+    <string name="expenses_details_date_content_description">Ausgabendatum bearbeiten</string>
+    <string name="expenses_details_save">Speichern</string>
+    <string name="expenses_details_title_placeholder">Lebensmittel</string>
+    <string name="expenses_details_date_placeholder">Datum</string>
+    <string name="expenses_details_discard_draft_dialog_title">Entwurf verwerfen</string>
+    <string name="expenses_details_discard_draft_dialog_text">Sind Sie sicher, dass die den Entwurf verwerfen möchten?</string>
+    <string name="expenses_details_discard_draft_dialog_dismiss">Weiter bearbeiten</string>
+    <string name="expenses_details_discard_draft_dialog_confirm">Entwurf verwerfen</string>
+
+    <!-- ExpenseCategory -->
+    <string name="expense_category_rent">Miete</string>
+    <string name="expense_category_utilities">Nebenkosten</string>
+    <string name="expense_category_groceries">Lebensmittel</string>
+    <string name="expense_category_pharmacy">Apotheke</string>
+    <string name="expense_category_restaurants">Restaurants und Bars</string>
+    <string name="expense_category_entertainment">Konzerte und Events</string>
+    <string name="expense_category_travel">Reisen</string>
+    <string name="expense_category_car">Auto und Parken</string>
+    <string name="expense_category_medical_expenses">Arztkosten</string>
+    <string name="expense_category_clothing">Bekleidung</string>
+    <string name="expense_category_grooming">Körperpflege</string>
+    <string name="expense_category_gifts">Geschenke</string>
+    <string name="expense_category_other">Sonstiges</string>
+
+    <!-- ExportManager -->
+    <string name="notification_channel_name">Herunterladen-Benachrichtigungen</string>
+    <string name="notification_download_success">Ausgaben wurden erfolgreich heruntergeladen</string>
+</resources>

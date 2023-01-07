@@ -33,18 +33,30 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CarRepair
+import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.ElectricCar
+import androidx.compose.material.icons.filled.GifBox
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.LocalPharmacy
+import androidx.compose.material.icons.filled.LocalSee
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Shower
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -466,10 +478,15 @@ fun ExpenseCard(
                     ExpenseCategory.Rent -> Icons.Filled.House
                     ExpenseCategory.Utilities -> Icons.Filled.Lightbulb
                     ExpenseCategory.Groceries -> Icons.Filled.ShoppingCart
+                    ExpenseCategory.Pharmacy -> Icons.Filled.LocalPharmacy
                     ExpenseCategory.Restaurants -> Icons.Filled.Restaurant
                     ExpenseCategory.Entertainment -> Icons.Filled.MusicNote
                     ExpenseCategory.Travel -> Icons.Filled.Hotel
-                    ExpenseCategory.Car -> Icons.Filled.ElectricCar
+                    ExpenseCategory.Car -> Icons.Filled.CarRepair
+                    ExpenseCategory.MedicalExpenses -> Icons.Filled.LocalHospital
+                    ExpenseCategory.Clothing -> Icons.Filled.ShoppingBasket
+                    ExpenseCategory.Grooming -> Icons.Filled.Spa
+                    ExpenseCategory.Gifts -> Icons.Filled.CardGiftcard
                     ExpenseCategory.Other -> Icons.Filled.Payments
                 }
 

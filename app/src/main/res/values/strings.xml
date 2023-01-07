@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ExpensesApp</string>
+    <string name="app_name" translatable="false">ExpensesApp</string>
 
     <!-- ExpensesListScreen -->
     <string name="expenses_list_header">List of Expenses</string>
@@ -23,8 +23,8 @@
     <string name="expenses_list_expenses_data_download_success">Expenses data downloaded</string>
     <string name="expenses_list_expenses_data_download_failure">Failed to download expenses data</string>
     <string name="expenses_list_total_expense_amount">TOTAL</string>
-    <string name="expenses_list_expense_amount">@string/expenses_details_amount</string>
-    <string name="expenses_list_expense_date">@string/expenses_details_date</string>
+    <string name="expenses_list_expense_amount" translatable="false">@string/expenses_details_amount</string>
+    <string name="expenses_list_expense_date" translatable="false">@string/expenses_details_date</string>
     <string name="expenses_list_delete_expense_dialog_title">Delete expense</string>
     <string name="expenses_list_delete_expense_dialog_text">Are you sure you want to delete the expense?</string>
     <string name="expenses_list_delete_expense_dialog_dismiss">Cancel</string>
@@ -49,12 +49,27 @@
     <string name="expenses_details_date_content_description">Update expense date</string>
     <string name="expenses_details_save">Save</string>
     <string name="expenses_details_title_placeholder">Groceries</string>
-    <string name="expenses_details_amount_placeholder">10,00</string>
+    <string name="expenses_details_amount_placeholder" translatable="false">10,00</string>
     <string name="expenses_details_date_placeholder">Date</string>
     <string name="expenses_details_discard_draft_dialog_title">Discard draft</string>
     <string name="expenses_details_discard_draft_dialog_text">Are you sure you want to discard the draft?</string>
     <string name="expenses_details_discard_draft_dialog_dismiss">Keep editing</string>
     <string name="expenses_details_discard_draft_dialog_confirm">Discard</string>
+
+    <!-- ExpenseCategory -->
+    <string name="expense_category_rent">Rent</string>
+    <string name="expense_category_utilities">Utilities</string>
+    <string name="expense_category_groceries">Groceries</string>
+    <string name="expense_category_pharmacy">Pharmacy</string>
+    <string name="expense_category_restaurants">Restaurants and bars</string>
+    <string name="expense_category_entertainment">Concerts and events</string>
+    <string name="expense_category_travel">Travel</string>
+    <string name="expense_category_car">Car and parking</string>
+    <string name="expense_category_medical_expenses">Medical expenses</string>
+    <string name="expense_category_clothing">Clothing</string>
+    <string name="expense_category_grooming">Grooming</string>
+    <string name="expense_category_gifts">Gifts</string>
+    <string name="expense_category_other">Other</string>
 
     <!-- ExportManager -->
     <string name="notification_channel_name">Download Notifications</string>

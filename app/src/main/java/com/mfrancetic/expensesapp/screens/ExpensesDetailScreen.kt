@@ -57,6 +57,7 @@ import com.mfrancetic.expensesapp.models.ExpenseViewData
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.TitleError
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
+import com.mfrancetic.expensesapp.utils.FormatUtils.name
 import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import java.text.SimpleDateFormat
 import java.util.*
@@ -371,7 +372,7 @@ fun ExpensesDetailCategoryTextField(
                     LocalContentAlpha.current
                 )
             ),
-            value = category.name, onValueChange = {
+            value = category.name(LocalContext.current), onValueChange = {
                 onCategoryUpdated(ExpenseCategory.valueOf(it))
             },
             label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
@@ -391,7 +392,7 @@ fun ExpensesDetailCategoryTextField(
                     onCategoryUpdated(expenseCategory)
                     expanded = false
                 }) {
-                    Text(expenseCategory.name)
+                    Text(expenseCategory.name(LocalContext.current))
                 }
             }
         }
