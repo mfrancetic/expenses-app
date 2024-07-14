@@ -38,23 +38,16 @@ import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.EditCalendar
-import androidx.compose.material.icons.filled.ElectricCar
-import androidx.compose.material.icons.filled.GifBox
 import androidx.compose.material.icons.filled.Hotel
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.LocalPharmacy
-import androidx.compose.material.icons.filled.LocalSee
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Shower
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.runtime.Composable
@@ -90,7 +83,11 @@ import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import com.mfrancetic.expensesapp.ui.theme.LightOrange
 import com.mfrancetic.expensesapp.utils.FormatUtils.formatCurrency
 import java.text.SimpleDateFormat
-import java.util.*
+import java.time.Instant
+import java.time.YearMonth
+import java.time.ZoneId
+import java.util.Date
+import java.util.Locale
 
 
 // region UI
@@ -354,26 +351,37 @@ fun ExpenseList(
         itemsIndexed(items = expenses,
             key = { _, expense -> expense.id }
         ) { index, expense ->
-            var simpleDateFormat = SimpleDateFormat("MMMM", Locale.getDefault())
-            val month = simpleDateFormat.format(expense.date)
-            val previousMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
-                simpleDateFormat.format(previousExpense.date)
+            val currentDate =
+                Instant.ofEpochMilli(expense.date)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+            val currentDateYearMonth = YearMonth.of(currentDate.year, currentDate.monthValue)
+            
+            val previousDateYearMonth = expenses.getOrNull(index - 1)?.let { previousExpense ->
+                val previousDate = Instant.ofEpochMilli(previousExpense.date)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                YearMonth.of(previousDate.year, previousDate.monthValue)
             }
 
             val monthlyExpenses =
-                expenses.filter { simpleDateFormat.format(it.date) == month }
+                expenses.filter {
+                    val date = Instant.ofEpochMilli(it.date)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                    YearMonth.of(date.year, date.monthValue) == currentDateYearMonth
+                }
 
             val monthlyExpensesAmountMap =
                 monthlyExpenses.groupBy { monthlyExpense -> monthlyExpense.currency }
                     .mapValues { entry -> entry.value.sumOf { it.amount } }
 
-            simpleDateFormat = SimpleDateFormat("YYYY", Locale.getDefault())
-            val year = simpleDateFormat.format(expense.date)
+            val title = SimpleDateFormat("MMMM YYYY", Locale.getDefault()).format(expense.date).uppercase()
 
             Column {
-                if (previousMonth != month) {
+                if (previousDateYearMonth != currentDateYearMonth) {
                     ExpenseHeader(
-                        title = "${month.uppercase()} $year",
+                        title = title,
                         amountCurrencyMap = monthlyExpensesAmountMap,
                         isTotalAmount = false
                     )
