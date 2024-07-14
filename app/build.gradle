@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace 'com.mfrancetic.expensesapp'
-    compileSdk 32
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.mfrancetic.expensesapp"
         minSdk 24
-        targetSdk 32
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
