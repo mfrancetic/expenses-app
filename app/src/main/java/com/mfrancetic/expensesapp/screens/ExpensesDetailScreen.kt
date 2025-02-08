@@ -58,7 +58,6 @@ import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
 import com.mfrancetic.expensesapp.models.TitleError
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import com.mfrancetic.expensesapp.utils.FormatUtils.name
-import com.mfrancetic.expensesapp.utils.ValidationConstants.MAX_AMOUNT
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -227,13 +226,21 @@ fun ExpensesDetailTitleTextField(
     onTitleUpdated: (String) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    var currentTitle by rememberSaveable {
+        mutableStateOf(title)
+    }
+
+    LaunchedEffect(title){
+        currentTitle = title
+    }
 
     TextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        value = title, onValueChange = {
-            onTitleUpdated(it)
+        value = currentTitle, onValueChange = {
+            currentTitle = it
+            onTitleUpdated(currentTitle)
         },
         isError = titleError != null,
         label = {
@@ -275,9 +282,23 @@ fun ExpensesDetailAmountTextField(
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
+    var currentAmount by rememberSaveable {
+        mutableStateOf(amount)
+    }
+    var currentCurrency by rememberSaveable {
+        mutableStateOf(currency)
+    }
 
     val icon =
         if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+
+    LaunchedEffect(amount){
+        currentAmount = amount
+    }
+
+    LaunchedEffect(currency){
+        currentCurrency = currency
+    }
 
     Column {
         TextField(
@@ -285,10 +306,11 @@ fun ExpensesDetailAmountTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            value = amount, onValueChange = {
+            value = currentAmount, onValueChange = {
                 if (it.isBlank() || it.toDoubleOrNull() != null
                 ) {
-                    onAmountUpdated(it)
+                    currentAmount = it
+                    onAmountUpdated(currentAmount)
                 }
             },
             isError = amountError != null,
@@ -337,7 +359,8 @@ fun ExpensesDetailAmountTextField(
         ) {
             ExpenseCurrency.values().forEach { currency ->
                 DropdownMenuItem(onClick = {
-                    onCurrencyUpdated(currency)
+                    currentCurrency = currency
+                    onCurrencyUpdated(currentCurrency)
                     expanded = false
                 }) {
                     Text(currency.name)
@@ -356,10 +379,18 @@ fun ExpensesDetailCategoryTextField(
     var expanded by rememberSaveable {
         mutableStateOf(false)
     }
+    var currentCategory by rememberSaveable {
+        mutableStateOf(category)
+    }
+
     val icon =
         if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
     val context = LocalContext.current
     val items = ExpenseCategory.values().sortedBy { it.name(context) }
+
+    LaunchedEffect(category){
+        currentCategory = category
+    }
 
     Column {
         TextField(
@@ -373,8 +404,9 @@ fun ExpensesDetailCategoryTextField(
                     LocalContentAlpha.current
                 )
             ),
-            value = category.name(LocalContext.current), onValueChange = {
-                onCategoryUpdated(ExpenseCategory.valueOf(it))
+            value = currentCategory.name(LocalContext.current), onValueChange = {
+                currentCategory = ExpenseCategory.valueOf(it)
+                onCategoryUpdated(currentCategory)
             },
             label = { Text(text = stringResource(id = R.string.expenses_details_category)) },
             trailingIcon = {
@@ -390,7 +422,8 @@ fun ExpensesDetailCategoryTextField(
         ) {
             items.forEach { expenseCategory ->
                 DropdownMenuItem(onClick = {
-                    onCategoryUpdated(expenseCategory)
+                    currentCategory = expenseCategory
+                    onCategoryUpdated(currentCategory)
                     expanded = false
                 }) {
                     Text(expenseCategory.name(LocalContext.current))
@@ -406,8 +439,16 @@ fun ExpensesDetailDateTextField(
     onDateUpdated: (Long) -> Unit,
 ) {
     val context = LocalContext.current
-    val currentDate = System.currentTimeMillis()
+    val today = System.currentTimeMillis()
     val calendar = Calendar.getInstance()
+
+    var currentDate by rememberSaveable {
+        mutableStateOf(date)
+    }
+
+    LaunchedEffect(date){
+        currentDate = date
+    }
 
     TextField(
         readOnly = true,
@@ -420,7 +461,7 @@ fun ExpensesDetailDateTextField(
                 LocalContentAlpha.current
             )
         ),
-        value = SimpleDateFormat.getDateInstance().format(date), onValueChange = {
+        value = SimpleDateFormat.getDateInstance().format(currentDate), onValueChange = {
         },
         label = {
             Text(text = stringResource(id = R.string.expenses_details_date))
@@ -429,7 +470,7 @@ fun ExpensesDetailDateTextField(
             Text(
                 text = SimpleDateFormat
                     .getDateInstance()
-                    .format(currentDate)
+                    .format(today)
             )
         },
         trailingIcon = {
@@ -440,7 +481,8 @@ fun ExpensesDetailDateTextField(
                     datePicker
                         .setOnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                             calendar.set(year, monthOfYear, dayOfMonth)
-                            onDateUpdated(calendar.timeInMillis)
+                            currentDate = calendar.timeInMillis
+                            onDateUpdated(currentDate)
                         }
                     datePicker.show()
                 })
