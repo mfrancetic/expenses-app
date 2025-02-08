@@ -29,6 +29,15 @@ class RepositoryModule {
         }
     }
 
+    private val migrationTwoToThree: Migration = object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "ALTER TABLE expenses "
+                        + "ADD COLUMN paymentType TEXT NOT NULL DEFAULT 'Cash'"
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext appContext: Context): ExpensesAppDatabase {
@@ -37,10 +46,8 @@ class RepositoryModule {
             ExpensesAppDatabase::class.java,
             "expenses_database"
         ).addMigrations(
-            migrationOneToTwo
-        ).setJournalMode(RoomDatabase.JournalMode.TRUNCATE).
-
-        build()
+            migrationOneToTwo ,migrationTwoToThree
+        ).setJournalMode(RoomDatabase.JournalMode.TRUNCATE).build()
     }
 
     @Provides

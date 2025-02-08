@@ -5,11 +5,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ExpenseViewData(
-    val id: String, val title: String,
+    val id: String,
+    val title: String,
     val amount: Double?,
     val amountString: String,
     val currency: ExpenseCurrency,
-    val category: ExpenseCategory, val date: Long,
-    val deletionDate: Long?
+    val category: ExpenseCategory,
+    val date: Long,
+    val deletionDate: Long?,
+    val paymentType: PaymentType,
 ) : Parcelable
 

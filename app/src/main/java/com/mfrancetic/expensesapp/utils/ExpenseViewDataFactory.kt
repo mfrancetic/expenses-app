@@ -14,7 +14,8 @@ object ExpenseViewDataFactory {
             currency = this.currency,
             category = this.category,
             date = this.date,
-            deletionDate = this.deletionDate
+            deletionDate = this.deletionDate,
+            paymentType = this.paymentType,
         )
     }
 
@@ -26,7 +27,8 @@ object ExpenseViewDataFactory {
             currency = this.currency,
             category = this.category,
             date = this.date,
-            deletionDate = this.deletionDate
+            deletionDate = this.deletionDate,
+            paymentType = this.paymentType,
         )
     }
 }
