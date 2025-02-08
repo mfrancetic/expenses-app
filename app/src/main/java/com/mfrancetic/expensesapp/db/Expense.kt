@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
+import com.mfrancetic.expensesapp.models.PaymentType
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 import javax.annotation.Nonnull
@@ -40,5 +41,9 @@ data class Expense(
     var date: Long = System.currentTimeMillis(),
 
     @ColumnInfo(name = "deletionDate")
-    var deletionDate: Long? = null
+    var deletionDate: Long? = null,
+
+    @ColumnInfo(name = "paymentType")
+    @Nonnull
+    var paymentType: PaymentType = PaymentType.Cash,
 ) : Parcelable

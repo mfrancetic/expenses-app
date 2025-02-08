@@ -45,6 +45,8 @@
     <string name="expenses_details_currency_content_description">Update expense currency</string>
     <string name="expenses_details_category">Category</string>
     <string name="expenses_details_category_content_description">Update expense category</string>
+    <string name="expenses_details_payment_type">Payment type</string>
+    <string name="expenses_details_payment_type_content_description">Update payment type</string>
     <string name="expenses_details_date">Date</string>
     <string name="expenses_details_date_content_description">Update expense date</string>
     <string name="expenses_details_save">Save</string>
@@ -70,6 +72,10 @@
     <string name="expense_category_grooming">Grooming</string>
     <string name="expense_category_gifts">Gifts</string>
     <string name="expense_category_other">Other</string>
+
+    <!-- PaymentType -->
+    <string name="payment_type_cash">Cash</string>
+    <string name="payment_type_card">Card</string>
 
     <!-- ExportManager -->
     <string name="notification_channel_name">Download Notifications</string>

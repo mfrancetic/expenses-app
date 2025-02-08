@@ -55,6 +55,7 @@ import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
 import com.mfrancetic.expensesapp.models.ExpenseViewData
 import com.mfrancetic.expensesapp.models.ExpensesDetailSideEffect
+import com.mfrancetic.expensesapp.models.PaymentType
 import com.mfrancetic.expensesapp.models.TitleError
 import com.mfrancetic.expensesapp.ui.theme.ExpensesAppTheme
 import com.mfrancetic.expensesapp.utils.FormatUtils.name
@@ -148,6 +149,12 @@ fun ExpensesDetailScreen(
                     category = expense.category
                 ) { newCategory ->
                     onExpenseUpdated(expense.copy(category = newCategory))
+                }
+
+                ExpensesDetailPaymentTypeTextField(
+                    paymentType = expense.paymentType
+                ) { newPaymentType ->
+                    onExpenseUpdated(expense.copy(paymentType = newPaymentType))
                 }
 
                 ExpensesDetailDateTextField(
@@ -427,6 +434,68 @@ fun ExpensesDetailCategoryTextField(
                     expanded = false
                 }) {
                     Text(expenseCategory.name(LocalContext.current))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpensesDetailPaymentTypeTextField(
+    paymentType: PaymentType,
+    onPaymentTypeUpdated: (PaymentType) -> Unit
+) {
+    var expanded by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var currentPaymentType by rememberSaveable {
+        mutableStateOf(paymentType)
+    }
+
+    val icon =
+        if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
+    val context = LocalContext.current
+    val paymentTypes = PaymentType.values().sortedBy { it.name(context) }
+
+    LaunchedEffect(paymentType){
+        currentPaymentType = paymentType
+    }
+
+    Column {
+        TextField(
+            readOnly = true,
+            enabled = false,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                disabledTextColor = LocalContentColor.current.copy(
+                    LocalContentAlpha.current
+                )
+            ),
+            value = currentPaymentType.name(LocalContext.current), onValueChange = {
+                currentPaymentType = PaymentType.valueOf(it)
+                onPaymentTypeUpdated(currentPaymentType)
+            },
+            label = { Text(text = stringResource(id = R.string.expenses_details_payment_type)) },
+            trailingIcon = {
+                Icon(imageVector = icon,
+                    contentDescription = stringResource(id = R.string.expenses_details_payment_type_content_description),
+                    modifier = Modifier.clickable { expanded = !expanded })
+            }
+        )
+
+        DropdownMenu(
+            expanded = expanded, onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            paymentTypes.forEach { availablePaymentType ->
+                DropdownMenuItem(onClick = {
+                    currentPaymentType = availablePaymentType
+                    onPaymentTypeUpdated(currentPaymentType)
+                    expanded = false
+                }) {
+                    Text(availablePaymentType.name(LocalContext.current))
                 }
             }
         }

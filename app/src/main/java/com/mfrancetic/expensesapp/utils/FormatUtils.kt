@@ -4,6 +4,7 @@ import android.content.Context
 import com.mfrancetic.expensesapp.R
 import com.mfrancetic.expensesapp.models.ExpenseCategory
 import com.mfrancetic.expensesapp.models.ExpenseCurrency
+import com.mfrancetic.expensesapp.models.PaymentType
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.util.*
@@ -43,4 +44,10 @@ object FormatUtils {
             ExpenseCategory.Other -> context.getString(R.string.expense_category_other)
         }
     }
+
+    fun PaymentType.name(context: Context): String =
+        when(this){
+            PaymentType.Cash -> context.getString(R.string.payment_type_cash)
+            PaymentType.Card -> context.getString(R.string.payment_type_card)
+        }
 }

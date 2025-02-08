@@ -42,6 +42,8 @@
     <string name="expenses_details_currency_content_description">Ausgabenwährung bearbeiten</string>
     <string name="expenses_details_category">Kategorie</string>
     <string name="expenses_details_category_content_description">Ausgabenkategorie bearbeiten</string>
+    <string name="expenses_details_payment_type">Zahlungsart</string>
+    <string name="expenses_details_payment_type_content_description">Zahlungsart bearbeiten</string>
     <string name="expenses_details_date">Datum</string>
     <string name="expenses_details_date_content_description">Ausgabendatum bearbeiten</string>
     <string name="expenses_details_save">Speichern</string>
@@ -66,6 +68,10 @@
     <string name="expense_category_grooming">Körperpflege</string>
     <string name="expense_category_gifts">Geschenke</string>
     <string name="expense_category_other">Sonstiges</string>
+
+    <!-- PaymentType -->
+    <string name="payment_type_cash">Bargeld</string>
+    <string name="payment_type_card">Karte</string>
 
     <!-- ExportManager -->
     <string name="notification_channel_name">Herunterladen-Benachrichtigungen</string>
